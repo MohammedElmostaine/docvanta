@@ -1,0 +1,41 @@
+spring:
+  application:
+    name: DOCVANTA-Backend
+
+  datasource:
+    url: jdbc:postgresql://localhost:5432/docvanta_db?createDatabaseIfNotExist=true
+    username: postgres
+    password: 123456
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: create
+    show-sql: false
+    properties:
+      hibernate:
+        format_sql: true
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+
+  jackson:
+    serialization:
+      write-dates-as-timestamps: false
+    default-property-inclusion: non_null
+
+server:
+  port: 8081
+  error:
+    include-message: always
+    include-binding-errors: always
+
+# JWT Configuration
+jwt:
+  secret: VGhpc0lzQVN1cGVyU2VjcmV0S2V5Rm9yRE9DVkFOVEFBcHBsaWNhdGlvbldoaWNoU2hvdWxkQmVBdExlYXN0MjU2Qml0c0xvbmc=
+  expiration: 86400000
+
+# Logging
+logging:
+  level:
+    org.springframework.security: INFO
+    org.hibernate.SQL: WARN
+    org.example.docvanta_bcakend: INFO
