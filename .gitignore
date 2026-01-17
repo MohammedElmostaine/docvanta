@@ -1,0 +1,87 @@
+# ========================
+# Backend - Spring Boot / Maven
+# ========================
+
+# Compiled output
+DOCVANTA_bcakend/target/
+DOCVANTA_bcakend/build/
+DOCVANTA_bcakend/out/
+DOCVANTA_bcakend/bin/
+
+# Maven
+DOCVANTA_bcakend/.mvn/
+DOCVANTA_bcakend/mvnw
+DOCVANTA_bcakend/mvnw.cmd
+
+# Build logs
+DOCVANTA_bcakend/build_output.txt
+DOCVANTA_bcakend/maven_output.txt
+
+# IntelliJ IDEA
+DOCVANTA_bcakend/.idea/
+DOCVANTA_bcakend/*.iws
+DOCVANTA_bcakend/*.iml
+DOCVANTA_bcakend/*.ipr
+
+# Eclipse / STS
+DOCVANTA_bcakend/.classpath
+DOCVANTA_bcakend/.project
+DOCVANTA_bcakend/.settings/
+DOCVANTA_bcakend/.springBeans
+DOCVANTA_bcakend/.sts4-cache
+DOCVANTA_bcakend/.apt_generated
+DOCVANTA_bcakend/.factorypath
+
+# VS Code
+.vscode/
+
+# ========================
+# Frontend - Angular / Node
+# ========================
+
+# Dependencies
+DOCVANTA_frontend/node_modules/
+
+# Angular cache & build
+DOCVANTA_frontend/.angular/
+DOCVANTA_frontend/dist/
+DOCVANTA_frontend/tmp/
+DOCVANTA_frontend/out-tsc/
+DOCVANTA_frontend/bazel-out/
+
+# Logs
+npm-debug.log
+yarn-error.log
+
+# IDE
+.idea/
+*.sublime-workspace
+.c9/
+*.launch
+
+# Test
+DOCVANTA_frontend/coverage/
+DOCVANTA_frontend/testem.log
+DOCVANTA_frontend/typings/
+DOCVANTA_frontend/__screenshots__/
+
+# ========================
+# General
+# ========================
+
+# OS
+.DS_Store
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# Environment
+*.env
+*.env.local
+
+# Misc
+*.log
+*.swp
+*.swo
+*~
+.github/
