@@ -1,0 +1,85 @@
+<div class="management-page">
+    <div class="page-header">
+        <div>
+            <h2>Clinics Management</h2>
+            <p class="subtitle">Manage clinic locations</p>
+        </div>
+        <button class="add-btn" (click)="openCreateModal()">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+            </svg>
+            New Clinic
+        </button>
+    </div>
+
+    @if (errorMessage) { <div class="error-banner">{{ errorMessage }}</div> }
+
+    @if (loading) {
+        <div class="loading-state"><div class="spinner"></div><span>Loading clinics...</span></div>
+    } @else if (clinics.length === 0) {
+        <div class="empty-state">
+            <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                <path d="M3 21h18"/><path d="M5 21V7l8-4v18"/><path d="M19 21V11l-6-4"/>
+            </svg>
+            <h3>No clinics found</h3>
+            <p>Create your first clinic to get started.</p>
+        </div>
+    } @else {
+        <div class="cards-grid">
+            @for (clinic of clinics; track clinic.clinicId) {
+                <div class="entity-card">
+                    <div class="card-header">
+                        <div class="avatar clinic-avatar">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M3 21h18"/><path d="M5 21V7l8-4v18"/><path d="M19 21V11l-6-4"/>
+                            </svg>
+                        </div>
+                        <div class="card-title">
+                            <h4>{{ clinic.name }}</h4>
+                            <span class="card-subtitle">{{ clinic.address }}</span>
+                        </div>
+                        <div class="card-actions">
+                            <button class="icon-btn" (click)="openEditModal(clinic)" title="Edit">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+                                    <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+                                </svg>
+                            </button>
+                            <button class="icon-btn delete-btn" (click)="deleteClinic(clinic.clinicId)" title="Delete">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <polyline points="3 6 5 6 21 6"/>
+                                    <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+</div>
+
+@if (showModal) {
+    <div class="modal-overlay" (click)="closeModal()">
+        <div class="modal" (click)="$event.stopPropagation()">
+            <div class="modal-header">
+                <h3>{{ editingId ? 'Edit Clinic' : 'New Clinic' }}</h3>
+                <button class="modal-close" (click)="closeModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label>Clinic Name</label>
+                    <input type="text" [(ngModel)]="formData.name" placeholder="Enter clinic name..." />
+                </div>
+                <div class="form-group">
+                    <label>Address</label>
+                    <input type="text" [(ngModel)]="formData.address" placeholder="Enter address..." />
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-cancel" (click)="closeModal()">Cancel</button>
+                <button class="btn-save" (click)="saveClinic()">{{ editingId ? 'Update' : 'Create' }}</button>
+            </div>
+        </div>
+    </div>
+}
