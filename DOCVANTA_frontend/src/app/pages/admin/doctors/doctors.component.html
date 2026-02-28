@@ -1,0 +1,137 @@
+<div class="management-page">
+    <div class="page-header">
+        <div>
+            <h2>Practitioners Management</h2>
+            <p class="subtitle">Manage clinic practitioners, specialties and credentials</p>
+        </div>
+    </div>
+
+    <!-- Search & Filters -->
+    <div class="toolbar">
+        <div class="search-box">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="11" cy="11" r="8"/>
+                <line x1="21" y1="21" x2="16.65" y2="16.65"/>
+            </svg>
+            <input type="text" [(ngModel)]="searchQuery" (input)="onSearch()" placeholder="Search practitioners by name, email..." class="search-input" />
+        </div>
+        <div class="toolbar-info">
+            <span class="count-badge">{{ filteredDoctors.length }} practitioner{{ filteredDoctors.length !== 1 ? 's' : '' }}</span>
+        </div>
+    </div>
+
+    @if (errorMessage) {
+        <div class="error-banner">{{ errorMessage }}</div>
+    }
+
+    @if (successMessage) {
+        <div class="success-banner">{{ successMessage }}</div>
+    }
+
+    @if (loading) {
+        <div class="loading-state">
+            <div class="spinner"></div>
+            <span>Loading practitioners...</span>
+        </div>
+    } @else if (filteredDoctors.length === 0) {
+        <div class="empty-state">
+            <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                <circle cx="12" cy="7" r="4"/>
+            </svg>
+            <h3>No practitioners found</h3>
+            <p>Register practitioners via the registration page to see them here.</p>
+        </div>
+    } @else {
+        <div class="cards-grid">
+            @for (doctor of filteredDoctors; track doctor.userId) {
+                <div class="entity-card">
+                    <div class="card-header">
+                        <div class="avatar doctor-avatar">
+                            {{ (doctor.firstName?.charAt(0) || '') + (doctor.lastName?.charAt(0) || '') }}
+                        </div>
+                        <div class="card-title">
+                            <h4>Dr. {{ doctor.firstName }} {{ doctor.lastName }}</h4>
+                            <span class="card-subtitle">{{ doctor.email }}</span>
+                        </div>
+                        <div class="card-actions">
+                            <button class="icon-btn edit-btn" (click)="openEdit(doctor)" title="Edit">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+                                </svg>
+                            </button>
+                            <button class="icon-btn delete-btn" (click)="deleteDoctor(doctor.userId)" title="Delete">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <polyline points="3 6 5 6 21 6"/>
+                                    <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="detail-row">
+                            <span class="detail-label">Phone</span>
+                            <span class="detail-value">{{ doctor.phone || 'N/A' }}</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-label">Specialties</span>
+                            <span class="detail-value">{{ getSpecialties(doctor) }}</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-label">Department</span>
+                            <span class="detail-value">{{ doctor.departmentName || 'Unassigned' }}</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-label">Status</span>
+                            <span class="status-badge" [class.status-active]="doctor.enabled" [class.status-inactive]="!doctor.enabled">
+                                {{ doctor.enabled ? 'Active' : 'Inactive' }}
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+</div>
+
+@if (editingDoctor) {
+<div class="modal-overlay" (click)="closeEdit()">
+    <div class="modal" (click)="$event.stopPropagation()">
+        <div class="modal-header">
+            <h3>Edit Practitioner</h3>
+            <button class="modal-close" (click)="closeEdit()">&times;</button>
+        </div>
+        <div class="modal-body">
+            <div class="form-row">
+                <div class="form-group">
+                    <label>First Name</label>
+                    <input type="text" [(ngModel)]="editForm.firstName" />
+                </div>
+                <div class="form-group">
+                    <label>Last Name</label>
+                    <input type="text" [(ngModel)]="editForm.lastName" />
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Email</label>
+                    <input type="email" [(ngModel)]="editForm.email" />
+                </div>
+                <div class="form-group">
+                    <label>Phone</label>
+                    <input type="tel" [(ngModel)]="editForm.phone" />
+                </div>
+            </div>
+            <div class="form-group">
+                <label>
+                    <input type="checkbox" [(ngModel)]="editForm.enabled" /> Active
+                </label>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button class="btn-cancel" (click)="closeEdit()">Cancel</button>
+            <button class="btn-save" (click)="saveEdit()">Save Changes</button>
+        </div>
+    </div>
+</div>
+}
