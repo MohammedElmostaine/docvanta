@@ -1,0 +1,59 @@
+.management-page { display: flex; flex-direction: column; gap: 1.5rem; }
+.page-header { display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 1rem; }
+.page-header h2 { font-size: 1.75rem; font-weight: 700; color: var(--color-neutral-900); }
+.subtitle { color: var(--color-neutral-500); margin-top: 0.25rem; font-size: 0.925rem; }
+
+.search-bar { display: flex; align-items: center; gap: 0.5rem; padding: 0.5rem 0.875rem; border: 2px solid var(--color-neutral-200); border-radius: 10px; background: white; min-width: 280px; }
+.search-bar svg { color: var(--color-neutral-400); flex-shrink: 0; }
+.search-bar input { border: none; outline: none; font-size: 0.875rem; color: var(--color-neutral-800); width: 100%; background: transparent; }
+
+.error-banner { background: #fef2f2; color: #991b1b; padding: 0.75rem 1rem; border-radius: 10px; font-size: 0.875rem; border: 1px solid #fecaca; }
+.loading-state, .empty-state { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 4rem 2rem; gap: 1rem; color: var(--color-neutral-400); background: white; border-radius: 16px; border: 1px solid var(--color-neutral-200); }
+.empty-state h3 { color: var(--color-neutral-600); font-size: 1.125rem; }
+.empty-state p { color: var(--color-neutral-400); font-size: 0.875rem; }
+.spinner { width: 32px; height: 32px; border: 3px solid var(--color-neutral-200); border-top-color: var(--color-primary-600); border-radius: 50%; animation: spin 0.8s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.cards-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 1rem; }
+.entity-card { background: white; border-radius: 14px; border: 1px solid var(--color-neutral-200); cursor: pointer; transition: box-shadow 0.2s, transform 0.2s; }
+.entity-card:hover { box-shadow: 0 8px 24px rgba(0,0,0,0.06); transform: translateY(-1px); }
+.card-header { display: flex; align-items: center; gap: 0.75rem; padding: 1.25rem; }
+.avatar { width: 44px; height: 44px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 0.875rem; color: white; flex-shrink: 0; }
+.patient-avatar { background: linear-gradient(135deg, #0d9488, #14b8a6); }
+.card-title { flex: 1; min-width: 0; }
+.card-title h4 { font-size: 0.975rem; font-weight: 700; color: var(--color-neutral-800); }
+.card-subtitle { font-size: 0.8rem; color: var(--color-neutral-500); }
+.card-meta { font-size: 0.8rem; color: var(--color-neutral-500); }
+
+/* Modal */
+.modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center; z-index: 1000; padding: 1rem; }
+.modal { background: white; border-radius: 16px; width: 100%; max-width: 480px; max-height: 90vh; overflow-y: auto; box-shadow: 0 25px 50px rgba(0,0,0,0.15); }
+.modal-lg { max-width: 600px; }
+.modal-header { display: flex; justify-content: space-between; align-items: center; padding: 1.5rem; border-bottom: 1px solid var(--color-neutral-200); }
+.modal-header h3 { font-size: 1.125rem; font-weight: 700; }
+.modal-close { width: 32px; height: 32px; border-radius: 8px; display: flex; align-items: center; justify-content: center; border: none; background: none; cursor: pointer; color: var(--color-neutral-400); font-size: 1.5rem; }
+.modal-close:hover { background: var(--color-neutral-100); }
+.modal-body { padding: 1.5rem; }
+
+.detail-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1.5rem; }
+.detail-item { display: flex; flex-direction: column; gap: 0.25rem; }
+.detail-label { font-size: 0.75rem; font-weight: 600; color: var(--color-neutral-500); text-transform: uppercase; letter-spacing: 0.05em; }
+.section-title { font-size: 1rem; font-weight: 700; color: var(--color-neutral-800); margin-bottom: 0.75rem; }
+.no-data { color: var(--color-neutral-400); font-size: 0.875rem; }
+
+.appointments-list { display: flex; flex-direction: column; gap: 0.5rem; }
+.appointment-row { display: flex; align-items: center; gap: 0.75rem; padding: 0.75rem; background: var(--color-neutral-50); border-radius: 8px; font-size: 0.85rem; }
+.apt-date { font-weight: 600; color: var(--color-neutral-700); white-space: nowrap; }
+.apt-reason { color: var(--color-neutral-500); font-size: 0.8rem; }
+
+.badge { padding: 0.2rem 0.625rem; border-radius: 6px; font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.03em; white-space: nowrap; }
+.badge-success { background: #ecfdf5; color: #065f46; }
+.badge-warning { background: #fffbeb; color: #92400e; }
+.badge-danger { background: #fef2f2; color: #991b1b; }
+.badge-info { background: #eff6ff; color: #1e40af; }
+.badge-secondary { background: var(--color-neutral-100); color: var(--color-neutral-600); }
+
+@media (max-width: 768px) {
+    .cards-grid { grid-template-columns: 1fr; }
+    .detail-grid { grid-template-columns: 1fr; }
+}

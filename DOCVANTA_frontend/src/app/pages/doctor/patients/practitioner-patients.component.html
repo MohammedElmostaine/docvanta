@@ -1,0 +1,77 @@
+<div class="management-page">
+    <div class="page-header">
+        <div>
+            <h2>My Patients</h2>
+            <p class="subtitle">Patients from your appointments</p>
+        </div>
+        <div class="search-bar">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+            <input type="text" [(ngModel)]="searchQuery" (ngModelChange)="applyFilter()" placeholder="Search patients..." />
+        </div>
+    </div>
+
+    @if (errorMessage) { <div class="error-banner">{{ errorMessage }}</div> }
+
+    @if (loading) {
+        <div class="loading-state"><div class="spinner"></div><span>Loading patients...</span></div>
+    } @else if (filteredPatients.length === 0) {
+        <div class="empty-state">
+            <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/>
+            </svg>
+            <h3>No patients found</h3>
+            <p>Your patients will appear here once appointments are created.</p>
+        </div>
+    } @else {
+        <div class="cards-grid">
+            @for (patient of filteredPatients; track patient.userId) {
+                <div class="entity-card" (click)="viewPatient(patient)">
+                    <div class="card-header">
+                        <div class="avatar patient-avatar">{{ getInitials(patient) }}</div>
+                        <div class="card-title">
+                            <h4>{{ patient.firstName }} {{ patient.lastName }}</h4>
+                            <span class="card-subtitle">{{ patient.email || 'No email' }}</span>
+                        </div>
+                        <div class="card-meta">
+                            @if (patient.phone) { <span class="meta-item">{{ patient.phone }}</span> }
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+</div>
+
+@if (selectedPatient) {
+    <div class="modal-overlay" (click)="closeDetail()">
+        <div class="modal modal-lg" (click)="$event.stopPropagation()">
+            <div class="modal-header">
+                <h3>{{ selectedPatient.firstName }} {{ selectedPatient.lastName }}</h3>
+                <button class="modal-close" (click)="closeDetail()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="detail-grid">
+                    <div class="detail-item"><span class="detail-label">Email</span><span>{{ selectedPatient.email || '-' }}</span></div>
+                    <div class="detail-item"><span class="detail-label">Phone</span><span>{{ selectedPatient.phone || '-' }}</span></div>
+                    <div class="detail-item"><span class="detail-label">Date of Birth</span><span>{{ formatDate(selectedPatient.dob) }}</span></div>
+                    <div class="detail-item"><span class="detail-label">Address</span><span>{{ selectedPatient.address || '-' }}</span></div>
+                </div>
+
+                <h4 class="section-title">Appointment History</h4>
+                @if (patientAppointments.length === 0) {
+                    <p class="no-data">No appointments found</p>
+                } @else {
+                    <div class="appointments-list">
+                        @for (apt of patientAppointments; track apt.appointmentId) {
+                            <div class="appointment-row">
+                                <div class="apt-date">{{ formatDate(apt.datetime) }} {{ formatTime(apt.datetime) }}</div>
+                                <span class="badge {{ getStatusClass(apt.status) }}">{{ apt.status }}</span>
+                                @if (apt.reason) { <span class="apt-reason">{{ apt.reason }}</span> }
+                            </div>
+                        }
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+}
