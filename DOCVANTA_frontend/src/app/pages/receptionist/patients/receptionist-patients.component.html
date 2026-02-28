@@ -1,0 +1,172 @@
+<div class="patients-container">
+    <div class="page-header">
+        <h1>Patients</h1>
+        <p class="subtitle">Search and manage patient information</p>
+    </div>
+
+    @if (error) {
+        <div class="alert alert-error">
+            <span class="alert-icon">&#9888;</span>
+            {{ error }}
+            <button class="btn-retry" (click)="loadPatients()">Retry</button>
+        </div>
+    }
+
+    <!-- Search -->
+    <div class="search-card">
+        <div class="search-row">
+            <div class="search-group">
+                <label for="searchInput">Search Patients</label>
+                <input
+                    type="text"
+                    id="searchInput"
+                    [(ngModel)]="searchQuery"
+                    (input)="onSearchChange()"
+                    class="search-input"
+                    placeholder="Search by name, email, or phone..."
+                />
+            </div>
+            <div class="search-actions">
+                <button class="btn btn-secondary" (click)="loadPatients()">
+                    <span class="btn-icon">&#8635;</span> Refresh
+                </button>
+            </div>
+        </div>
+    </div>
+
+    @if (loading) {
+        <div class="loading-container">
+            <div class="spinner"></div>
+            <p>Loading patients...</p>
+        </div>
+    } @else {
+        <div class="table-card">
+            @if (filteredPatients.length === 0) {
+                <div class="empty-state">
+                    <div class="empty-icon">&#128100;</div>
+                    @if (searchQuery) {
+                        <p>No patients match "{{ searchQuery }}".</p>
+                    } @else {
+                        <p>No patients found.</p>
+                    }
+                </div>
+            } @else {
+                <div class="table-responsive">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Email</th>
+                                <th>Phone</th>
+                                <th>Date of Birth</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @for (patient of filteredPatients; track patient.userId) {
+                                <tr>
+                                    <td class="name-cell">
+                                        <div class="patient-avatar">{{ patient.firstName.charAt(0) }}{{ patient.lastName.charAt(0) }}</div>
+                                        <span>{{ patient.firstName }} {{ patient.lastName }}</span>
+                                    </td>
+                                    <td class="email-cell">{{ patient.email || '-' }}</td>
+                                    <td>{{ patient.phone || '-' }}</td>
+                                    <td>{{ formatDate(patient.dob) }}</td>
+                                    <td class="actions-cell">
+                                        <button
+                                            class="btn btn-info btn-sm"
+                                            (click)="viewInvoices(patient)"
+                                            title="View invoices"
+                                        >
+                                            View Invoices
+                                        </button>
+                                        <a
+                                            class="btn btn-primary btn-sm"
+                                            [routerLink]="['/receptionist/invoices/new']"
+                                            [queryParams]="{ patientId: patient.userId }"
+                                            title="Create new invoice"
+                                        >
+                                            New Invoice
+                                        </a>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="table-footer">
+                    <span>Showing {{ filteredPatients.length }} of {{ patients.length }} patient{{ patients.length !== 1 ? 's' : '' }}</span>
+                </div>
+            }
+        </div>
+    }
+</div>
+
+<!-- Invoice Modal -->
+@if (showInvoiceModal) {
+    <div class="modal-overlay" (click)="onOverlayClick($event)">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Invoices for {{ selectedPatientName }}</h2>
+                <button class="modal-close" (click)="closeModal()">&times;</button>
+            </div>
+
+            <div class="modal-body">
+                @if (invoicesLoading) {
+                    <div class="loading-container modal-loading">
+                        <div class="spinner"></div>
+                        <p>Loading invoices...</p>
+                    </div>
+                } @else if (patientInvoices.length === 0) {
+                    <div class="empty-state">
+                        <p>No invoices found for this patient.</p>
+                    </div>
+                } @else {
+                    <div class="table-responsive">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Invoice #</th>
+                                    <th>Date</th>
+                                    <th>Total</th>
+                                    <th>Paid</th>
+                                    <th>Remaining</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @for (inv of patientInvoices; track inv.invoiceId) {
+                                    <tr>
+                                        <td class="invoice-num">{{ inv.invoiceNumber }}</td>
+                                        <td>{{ formatDate(inv.createdAt) }}</td>
+                                        <td class="amount-cell">{{ formatCurrency(inv.totalAmount) }}</td>
+                                        <td>{{ formatCurrency(inv.paidAmount) }}</td>
+                                        <td class="remaining-cell">{{ formatCurrency(inv.remainingAmount) }}</td>
+                                        <td>
+                                            <span class="badge" [class]="getInvoiceStatusClass(inv.status)">
+                                                {{ inv.status }}
+                                            </span>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                }
+            </div>
+
+            <div class="modal-footer">
+                <a
+                    class="btn btn-primary"
+                    [routerLink]="['/receptionist/invoices/new']"
+                    [queryParams]="{ patientId: selectedPatient?.userId }"
+                    (click)="closeModal()"
+                >
+                    Create New Invoice
+                </a>
+                <button class="btn btn-secondary" (click)="closeModal()">Close</button>
+            </div>
+        </div>
+    </div>
+}
