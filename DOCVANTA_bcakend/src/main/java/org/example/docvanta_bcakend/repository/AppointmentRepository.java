@@ -80,3 +80,4 @@ public interface AppointmentRepository extends JpaRepository<Appointment, Long> 
                                                      @Param("dayStart") LocalDateTime dayStart,
                                                      @Param("dayEnd") LocalDateTime dayEnd);
 }
+
