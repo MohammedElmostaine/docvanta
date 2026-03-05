@@ -167,3 +167,4 @@ public class SchedulingService {
         return LocalTime.of(slotMinutes / 60, slotMinutes % 60);
     }
 }
+
