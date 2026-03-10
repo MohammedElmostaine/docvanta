@@ -1,0 +1,268 @@
+.modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(4px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    animation: fadeIn 0.2s ease;
+}
+
+.modal-panel {
+    background: #fff;
+    border-radius: 16px;
+    width: 90%;
+    max-width: 560px;
+    max-height: 85vh;
+    overflow-y: auto;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+    animation: slideUp 0.25s ease;
+}
+
+/* Header */
+.modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 20px 24px 12px;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.header-left {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.header-left h2 {
+    margin: 0;
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: #1a1a2e;
+}
+
+.appointment-id {
+    font-size: 0.8rem;
+    color: #8b8fa3;
+    background: #f5f5f7;
+    padding: 2px 8px;
+    border-radius: 6px;
+    font-weight: 500;
+}
+
+.close-btn {
+    background: #f5f5f7;
+    border: none;
+    border-radius: 8px;
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    color: #6b7280;
+    transition: all 0.15s;
+}
+.close-btn:hover { background: #e5e5ea; color: #1a1a2e; }
+
+/* Status Row */
+.status-row {
+    display: flex;
+    gap: 8px;
+    padding: 12px 24px;
+    flex-wrap: wrap;
+}
+
+.status-chip {
+    padding: 5px 14px;
+    border-radius: 20px;
+    font-size: 0.78rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+}
+
+.status-pending { background: #fff3cd; color: #856404; }
+.status-confirmed { background: #d4edda; color: #155724; }
+.status-completed { background: #cce5ff; color: #004085; }
+.status-invoiced { background: #e2e3f1; color: #383d6e; }
+.status-paid { background: #d1ecf1; color: #0c5460; }
+.status-cancelled { background: #f8d7da; color: #721c24; }
+.status-rejected { background: #f8d7da; color: #721c24; }
+.status-default { background: #e9ecef; color: #495057; }
+
+.payment-paid { background: #d1ecf1; color: #0c5460; }
+.payment-partial { background: #fff3cd; color: #856404; }
+.payment-unpaid { background: #f8d7da; color: #721c24; }
+
+/* Details Grid */
+.details-grid {
+    padding: 16px 24px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+}
+
+.detail-section {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.detail-section.full-width {
+    grid-column: 1 / -1;
+}
+
+.detail-section h4 {
+    margin: 0;
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: #8b8fa3;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.detail-section h4 svg { color: #a0a4b8; }
+
+.detail-item {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.detail-label {
+    font-size: 0.75rem;
+    color: #8b8fa3;
+}
+
+.detail-value {
+    font-size: 0.92rem;
+    font-weight: 500;
+    color: #1a1a2e;
+}
+
+.detail-value.highlight {
+    color: #4361ee;
+    font-weight: 600;
+}
+
+.reason-text {
+    margin: 0;
+    font-size: 0.9rem;
+    color: #4a4a5a;
+    line-height: 1.5;
+    background: #f9f9fb;
+    padding: 10px 14px;
+    border-radius: 8px;
+    border-left: 3px solid #4361ee;
+}
+
+/* Billing */
+.billing-row {
+    display: flex;
+    gap: 20px;
+    flex-wrap: wrap;
+}
+
+.billing-item {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.billing-label {
+    font-size: 0.75rem;
+    color: #8b8fa3;
+}
+
+.billing-value {
+    font-size: 0.92rem;
+    font-weight: 600;
+    color: #1a1a2e;
+}
+
+.billing-value.highlight { color: #059669; }
+
+.mini-badge {
+    display: inline-block;
+    font-size: 0.65rem;
+    padding: 1px 6px;
+    border-radius: 4px;
+    background: #e9ecef;
+    color: #495057;
+    margin-left: 4px;
+    font-weight: 500;
+    vertical-align: middle;
+}
+
+/* Acts List */
+.acts-list {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.act-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 12px;
+    background: #f9f9fb;
+    border-radius: 8px;
+    font-size: 0.85rem;
+}
+
+.act-name { flex: 1; font-weight: 500; color: #1a1a2e; }
+.act-qty { color: #8b8fa3; font-size: 0.8rem; }
+.act-price { font-weight: 600; color: #059669; }
+
+/* Actions */
+.modal-actions {
+    display: flex;
+    gap: 10px;
+    padding: 16px 24px 20px;
+    border-top: 1px solid #f0f0f0;
+    flex-wrap: wrap;
+}
+
+.action-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 9px 18px;
+    border: none;
+    border-radius: 10px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.15s;
+}
+.action-btn:disabled { opacity: 0.6; cursor: not-allowed; }
+
+.btn-confirm { background: #d4edda; color: #155724; }
+.btn-confirm:hover:not(:disabled) { background: #c3e6cb; }
+
+.btn-complete { background: #cce5ff; color: #004085; }
+.btn-complete:hover:not(:disabled) { background: #b8daff; }
+
+.btn-reject { background: #f8d7da; color: #721c24; }
+.btn-reject:hover:not(:disabled) { background: #f5c6cb; }
+
+.btn-cancel { background: #fff3cd; color: #856404; }
+.btn-cancel:hover:not(:disabled) { background: #ffeeba; }
+
+/* Animations */
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+@keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+
+/* Responsive */
+@media (max-width: 480px) {
+    .details-grid { grid-template-columns: 1fr; }
+    .modal-panel { width: 95%; max-height: 90vh; }
+    .billing-row { flex-direction: column; gap: 10px; }
+}
