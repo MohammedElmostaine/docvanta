@@ -1,0 +1,265 @@
+<div class="patient-appointments-page">
+    <!-- Header -->
+    <div class="page-header">
+        <div class="header-left">
+            <h1>My Appointments</h1>
+            <p>View and manage your medical appointments</p>
+        </div>
+        <button class="btn-primary" (click)="openRequestModal()">
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            Request Appointment
+        </button>
+    </div>
+
+    <!-- Success / Error Messages -->
+    @if (successMessage) {
+        <div class="alert alert-success">
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+            {{ successMessage }}
+        </div>
+    }
+    @if (errorMessage && !showRequestModal) {
+        <div class="alert alert-error">
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+            {{ errorMessage }}
+        </div>
+    }
+
+    <!-- Filters -->
+    <div class="filters-bar">
+        <div class="filter-group">
+            <div class="filter-item">
+                <label>Status</label>
+                <select [(ngModel)]="statusFilter" (ngModelChange)="applyFilters()">
+                    <option value="ALL">All Statuses</option>
+                    <option value="PENDING">Pending</option>
+                    <option value="CONFIRMED">Confirmed</option>
+                    <option value="COMPLETED">Completed</option>
+                    <option value="CANCELLED">Cancelled</option>
+                </select>
+            </div>
+            <div class="filter-item">
+                <label>Period</label>
+                <select [(ngModel)]="periodFilter" (ngModelChange)="applyFilters()">
+                    <option value="ALL">All Time</option>
+                    <option value="UPCOMING">Upcoming</option>
+                    <option value="PAST">Past</option>
+                </select>
+            </div>
+        </div>
+        <div class="search-box">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+            <input type="text" placeholder="Search by practitioner name..." [(ngModel)]="searchTerm" (ngModelChange)="applyFilters()">
+        </div>
+    </div>
+
+    <!-- Loading -->
+    @if (loading) {
+        <div class="loading-state">
+            <div class="spinner"></div>
+            <p>Loading appointments...</p>
+        </div>
+    } @else {
+        <!-- Appointments List -->
+        @if (filteredAppointments.length === 0) {
+            <div class="empty-state">
+                <svg xmlns="http://www.w3.org/2000/svg" width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                <h3>No appointments found</h3>
+                <p>You don't have any appointments matching your filters.</p>
+                <button class="btn-primary" (click)="openRequestModal()">Request an Appointment</button>
+            </div>
+        } @else {
+            <div class="appointments-list">
+                @for (apt of filteredAppointments; track apt.appointmentId) {
+                    <div class="appointment-card" [class.upcoming]="isUpcoming(apt.datetime)" [class.past]="!isUpcoming(apt.datetime)">
+                        <div class="apt-left">
+                            <div class="apt-date-badge" [class.upcoming-badge]="isUpcoming(apt.datetime)">
+                                <span class="apt-day">{{ formatDate(apt.datetime).split(' ')[1] }}</span>
+                                <span class="apt-month">{{ formatDate(apt.datetime).split(' ')[2] }}</span>
+                                <span class="apt-year">{{ formatDate(apt.datetime).split(' ')[3] }}</span>
+                            </div>
+                        </div>
+                        <div class="apt-center">
+                            <div class="apt-main">
+                                <h4 class="apt-doctor">Dr. {{ apt.practitionerName || 'N/A' }}</h4>
+                                <div class="apt-meta">
+                                    <span class="apt-time-label">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                                        {{ formatTime(apt.datetime) }}
+                                    </span>
+                                    <span class="apt-weekday">{{ formatDate(apt.datetime).split(' ')[0] }}</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="apt-right">
+                            <span class="badge" [class]="getStatusClass(apt.status)">{{ apt.status }}</span>
+                            @if (isUpcoming(apt.datetime) && apt.status !== 'CANCELLED') {
+                                <button class="btn-cancel" (click)="openCancelModal(apt)" title="Cancel appointment">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                                    Cancel
+                                </button>
+                            }
+                        </div>
+                    </div>
+                }
+            </div>
+        }
+    }
+
+    <!-- New Appointment Modal -->
+    @if (showRequestModal) {
+        <div class="modal-overlay" (click)="closeRequestModal()">
+            <div class="modal modal-booking" (click)="$event.stopPropagation()">
+                <div class="modal-header">
+                    <h2>Request an Appointment</h2>
+                    <button class="btn-close" (click)="closeRequestModal()">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    @if (errorMessage) {
+                        <div class="alert alert-error compact">{{ errorMessage }}</div>
+                    }
+
+                    <!-- Step 1: Choose Practitioner -->
+                    <div class="booking-step">
+                        <div class="step-label">
+                            <span class="step-number" [class.step-done]="selectedPractitionerId">1</span>
+                            Choose a Practitioner
+                        </div>
+                        <select [(ngModel)]="selectedPractitionerId" (ngModelChange)="onPractitionerChange()">
+                            <option [ngValue]="null" disabled>Select a practitioner...</option>
+                            @for (doc of practitioners; track doc.userId) {
+                                <option [ngValue]="doc.userId">Dr. {{ doc.firstName }} {{ doc.lastName }}{{ doc.specialties?.length ? ' — ' + doc.specialties[0] : '' }}</option>
+                            }
+                        </select>
+                    </div>
+
+                    <!-- Step 2: Pick a Date -->
+                    @if (selectedPractitionerId) {
+                        <div class="booking-step">
+                            <div class="step-label">
+                                <span class="step-number" [class.step-done]="selectedDate">2</span>
+                                Pick a Date
+                            </div>
+                            <input type="date" [(ngModel)]="selectedDate" (ngModelChange)="onDateChange()" [min]="minDate">
+                        </div>
+                    }
+
+                    <!-- Step 3: Select Time Slot -->
+                    @if (selectedPractitionerId && selectedDate) {
+                        <div class="booking-step">
+                            <div class="step-label">
+                                <span class="step-number" [class.step-done]="selectedSlot">3</span>
+                                Select a Time
+                            </div>
+
+                            @if (loadingSlots) {
+                                <div class="slots-loading">
+                                    <div class="spinner-small"></div>
+                                    <span>Loading available times...</span>
+                                </div>
+                            } @else if (slotsError) {
+                                <div class="slots-error">{{ slotsError }}</div>
+                            } @else if (availableSlots.length === 0) {
+                                <div class="slots-empty">No slots available for this date.</div>
+                            } @else {
+                                <p class="slots-hint">{{ formatSelectedDate() }}</p>
+                                <div class="slots-grid">
+                                    @for (slot of availableSlots; track slot.startTime) {
+                                        <button
+                                            class="slot-btn"
+                                            [class.slot-available]="slot.available"
+                                            [class.slot-busy]="!slot.available"
+                                            [class.slot-selected]="selectedSlot?.startTime === slot.startTime"
+                                            [disabled]="!slot.available"
+                                            (click)="selectSlot(slot)"
+                                            [title]="slot.available ? 'Available' : 'Already booked'">
+                                            {{ formatSlotTime(slot.startTime) }}
+                                        </button>
+                                    }
+                                </div>
+                                @if (!hasAvailableSlots) {
+                                    <p class="slots-full-msg">All slots are booked for this date. Please try another date.</p>
+                                }
+                            }
+                        </div>
+                    }
+
+                    <!-- Step 4: Optional Description -->
+                    @if (selectedSlot) {
+                        <div class="booking-step">
+                            <div class="step-label">
+                                <span class="step-number step-optional">4</span>
+                                Reason <span class="optional-tag">optional</span>
+                            </div>
+                            <textarea
+                                [(ngModel)]="reason"
+                                placeholder="Briefly describe the reason for your visit..."
+                                rows="3"
+                                maxlength="500"
+                                class="reason-input"></textarea>
+                            <span class="char-count">{{ reason.length }}/500</span>
+                        </div>
+                    }
+
+                    <!-- Summary -->
+                    @if (selectedSlot) {
+                        <div class="booking-summary">
+                            <div class="summary-title">Appointment Summary</div>
+                            <div class="summary-row">
+                                <span class="summary-label">Practitioner</span>
+                                <span class="summary-value">{{ getSelectedPractitionerName() }}</span>
+                            </div>
+                            <div class="summary-row">
+                                <span class="summary-label">Date</span>
+                                <span class="summary-value">{{ formatSelectedDate() }}</span>
+                            </div>
+                            <div class="summary-row">
+                                <span class="summary-label">Time</span>
+                                <span class="summary-value">{{ formatSlotTime(selectedSlot.startTime) }} — {{ formatSlotTime(selectedSlot.endTime) }}</span>
+                            </div>
+                            @if (reason.trim()) {
+                                <div class="summary-row">
+                                    <span class="summary-label">Reason</span>
+                                    <span class="summary-value summary-reason">{{ reason }}</span>
+                                </div>
+                            }
+                        </div>
+                    }
+                </div>
+                <div class="modal-footer">
+                    <button class="btn-secondary" (click)="closeRequestModal()">Cancel</button>
+                    <button class="btn-primary" (click)="submitAppointment()" [disabled]="submitting || !selectedSlot">
+                        @if (submitting) {
+                            <span class="btn-spinner"></span> Submitting...
+                        } @else {
+                            Submit Request
+                        }
+                    </button>
+                </div>
+            </div>
+        </div>
+    }
+
+    <!-- Cancel Confirmation Modal -->
+    @if (showCancelModal) {
+        <div class="modal-overlay" (click)="closeCancelModal()">
+            <div class="modal modal-sm" (click)="$event.stopPropagation()">
+                <div class="modal-header">
+                    <h2>Cancel Appointment</h2>
+                    <button class="btn-close" (click)="closeCancelModal()">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <p>Are you sure you want to cancel your appointment with <strong>Dr. {{ selectedAppointment?.practitionerName }}</strong> on <strong>{{ formatDate(selectedAppointment?.datetime || '') }}</strong> at <strong>{{ formatTime(selectedAppointment?.datetime || '') }}</strong>?</p>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn-secondary" (click)="closeCancelModal()">Keep Appointment</button>
+                    <button class="btn-danger" (click)="confirmCancel()">Yes, Cancel It</button>
+                </div>
+            </div>
+        </div>
+    }
+</div>

@@ -1,0 +1,179 @@
+<div class="management-page">
+    <div class="page-header">
+        <div>
+            <h2>My Appointments</h2>
+            <p class="subtitle">Manage your appointments and performed acts</p>
+        </div>
+    </div>
+
+    @if (successMessage) { <div class="success-banner">{{ successMessage }}</div> }
+    @if (errorMessage) { <div class="error-banner">{{ errorMessage }}</div> }
+
+    <div class="filters-bar">
+        <div class="search-bar">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+            <input type="text" [(ngModel)]="searchQuery" (ngModelChange)="applyFilters()" placeholder="Search by patient name..." />
+        </div>
+        <div class="filter-group">
+            <select [(ngModel)]="statusFilter" (ngModelChange)="applyFilters()">
+                <option value="ALL">All Statuses</option>
+                <option value="PENDING">Pending</option>
+                <option value="CONFIRMED">Confirmed</option>
+                <option value="COMPLETED">Completed</option>
+                <option value="INVOICED">Invoiced</option>
+                <option value="PAID">Paid</option>
+                <option value="CANCELLED">Cancelled</option>
+                <option value="REJECTED">Rejected</option>
+            </select>
+            <select [(ngModel)]="periodFilter" (ngModelChange)="applyFilters()">
+                <option value="ALL">All Time</option>
+                <option value="TODAY">Today</option>
+                <option value="UPCOMING">Upcoming</option>
+                <option value="PAST">Past</option>
+            </select>
+        </div>
+    </div>
+
+    @if (loading) {
+        <div class="loading-state"><div class="spinner"></div><span>Loading appointments...</span></div>
+    } @else if (filteredAppointments.length === 0) {
+        <div class="empty-state">
+            <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/>
+            </svg>
+            <h3>No appointments found</h3>
+            <p>No matching appointments.</p>
+        </div>
+    } @else {
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Date & Time</th>
+                        <th>Patient</th>
+                        <th>Reason</th>
+                        <th>Est. Price</th>
+                        <th>Final Price</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @for (apt of filteredAppointments; track apt.appointmentId) {
+                        <tr [class.expanded-row]="expandedAppointmentId === apt.appointmentId">
+                            <td class="date-cell">
+                                <span class="date-main">{{ formatDate(apt.datetime) }}</span>
+                                <span class="date-sub">{{ formatTime(apt.datetime) }}</span>
+                            </td>
+                            <td class="patient-cell">{{ apt.patientName }}</td>
+                            <td class="reason-cell">{{ apt.reason || '-' }}</td>
+                            <td class="price-cell">{{ formatPrice(apt.estimatedPrice) }}</td>
+                            <td class="price-cell">{{ formatPrice(apt.finalPrice) }}</td>
+                            <td><span class="badge {{ getStatusClass(apt.status) }}">{{ apt.status }}</span></td>
+                            <td class="actions-cell">
+                                @if (canAddActs(apt)) {
+                                    <button class="action-btn acts-btn" (click)="togglePerformedActs(apt)" [title]="expandedAppointmentId === apt.appointmentId ? 'Hide acts' : 'Manage acts'">
+                                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/></svg>
+                                    </button>
+                                }
+                                @if (canConfirm(apt)) {
+                                    <button class="action-btn approve-btn" (click)="confirmAppointment(apt.appointmentId)" title="Confirm">
+                                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+                                    </button>
+                                }
+                                @if (canReject(apt)) {
+                                    <button class="action-btn reject-btn" (click)="rejectAppointment(apt.appointmentId)" title="Reject">
+                                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                                    </button>
+                                }
+                                @if (canComplete(apt)) {
+                                    <button class="action-btn complete-btn" (click)="completeAppointment(apt.appointmentId)" title="Complete">
+                                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+                                    </button>
+                                }
+                                @if (canCancel(apt)) {
+                                    <button class="action-btn cancel-btn" (click)="cancelAppointment(apt.appointmentId)" title="Cancel">
+                                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>
+                                    </button>
+                                }
+                            </td>
+                        </tr>
+                        <!-- Performed Acts Expandable Panel -->
+                        @if (expandedAppointmentId === apt.appointmentId) {
+                            <tr class="acts-panel-row">
+                                <td colspan="7">
+                                    <div class="acts-panel">
+                                        <div class="acts-header">
+                                            <h4>Performed Acts</h4>
+                                            <span class="acts-total">Total: {{ formatPrice(getActTotal()) }}</span>
+                                        </div>
+
+                                        @if (actsLoading) {
+                                            <div class="acts-loading"><div class="spinner-sm"></div> Loading acts...</div>
+                                        } @else {
+                                            @if (performedActs.length > 0) {
+                                                <table class="acts-table">
+                                                    <thead>
+                                                        <tr>
+                                                            <th>Code</th>
+                                                            <th>Act</th>
+                                                            <th>Category</th>
+                                                            <th>Qty</th>
+                                                            <th>Unit Price</th>
+                                                            <th>Total</th>
+                                                            <th>Notes</th>
+                                                            @if (canRemoveActs(apt)) { <th></th> }
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        @for (act of performedActs; track act.performedActId) {
+                                                            <tr>
+                                                                <td><span class="act-code">{{ act.medicalActCode }}</span></td>
+                                                                <td>{{ act.medicalActName }}</td>
+                                                                <td><span class="act-category">{{ act.category }}</span></td>
+                                                                <td>{{ act.quantity }}</td>
+                                                                <td>{{ formatPrice(act.unitPrice) }}</td>
+                                                                <td class="price-bold">{{ formatPrice(act.totalPrice) }}</td>
+                                                                <td class="notes-cell">{{ act.notes || '-' }}</td>
+                                                                @if (canRemoveActs(apt)) {
+                                                                    <td>
+                                                                        <button class="action-btn reject-btn" (click)="removePerformedAct(act.performedActId)" title="Remove">
+                                                                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                                                                        </button>
+                                                                    </td>
+                                                                }
+                                                            </tr>
+                                                        }
+                                                    </tbody>
+                                                </table>
+                                            } @else {
+                                                <p class="no-acts">No performed acts recorded yet.</p>
+                                            }
+
+                                            <!-- Add new act form -->
+                                            @if (canAddActs(apt)) {
+                                                <div class="add-act-form">
+                                                    <select [(ngModel)]="selectedActId" class="act-select">
+                                                        <option [ngValue]="null" disabled>Select medical act...</option>
+                                                        @for (act of medicalActs; track act.medicalActId) {
+                                                            <option [ngValue]="act.medicalActId">{{ act.code }} - {{ act.name }} ({{ formatPrice(act.basePrice) }})</option>
+                                                        }
+                                                    </select>
+                                                    <input type="number" [(ngModel)]="actQuantity" min="1" max="99" class="qty-input" placeholder="Qty" />
+                                                    <input type="text" [(ngModel)]="actNotes" class="notes-input" placeholder="Notes (optional)" />
+                                                    <button class="add-act-btn" (click)="addPerformedAct()" [disabled]="!selectedActId || addingAct">
+                                                        @if (addingAct) { Adding... } @else { + Add Act }
+                                                    </button>
+                                                </div>
+                                            }
+                                        }
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+</div>
