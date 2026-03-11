@@ -1,0 +1,140 @@
+<div class="appointments-container">
+    <div class="page-header">
+        <h1>Appointments</h1>
+        <p class="subtitle">Manage and track patient appointments</p>
+    </div>
+
+    @if (successMessage) {
+        <div class="alert alert-success">
+            <span class="alert-icon">&#10003;</span>
+            {{ successMessage }}
+        </div>
+    }
+
+    @if (error) {
+        <div class="alert alert-error">
+            <span class="alert-icon">&#9888;</span>
+            {{ error }}
+            <button class="btn-retry" (click)="loadAppointments()">Retry</button>
+        </div>
+    }
+
+    <div class="filters-card">
+        <div class="filters-row">
+            <div class="filter-group">
+                <label for="dateFilter">Date</label>
+                <input
+                    type="date"
+                    id="dateFilter"
+                    [(ngModel)]="selectedDate"
+                    (change)="onDateChange()"
+                    class="filter-input"
+                />
+            </div>
+
+            <div class="filter-group">
+                <label for="statusFilter">Status</label>
+                <select
+                    id="statusFilter"
+                    [(ngModel)]="selectedStatus"
+                    (change)="onStatusChange()"
+                    class="filter-input"
+                >
+                    @for (status of statuses; track status) {
+                        <option [value]="status">{{ status }} ({{ getStatusCount(status) }})</option>
+                    }
+                </select>
+            </div>
+
+            <div class="filter-group filter-actions">
+                <button class="btn btn-secondary" (click)="loadAppointments()">
+                    <span class="btn-icon">&#8635;</span> Refresh
+                </button>
+            </div>
+        </div>
+    </div>
+
+    @if (loading) {
+        <div class="loading-container">
+            <div class="spinner"></div>
+            <p>Loading appointments...</p>
+        </div>
+    } @else {
+        <div class="table-card">
+            @if (filteredAppointments.length === 0) {
+                <div class="empty-state">
+                    <div class="empty-icon">&#128197;</div>
+                    <p>No appointments found for the selected filters.</p>
+                </div>
+            } @else {
+                <div class="table-responsive">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Time</th>
+                                <th>Date</th>
+                                <th>Patient</th>
+                                <th>Practitioner</th>
+                                <th>Reason</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @for (appt of filteredAppointments; track appt.appointmentId) {
+                                <tr>
+                                    <td class="time-cell">{{ formatTime(appt.datetime) }}</td>
+                                    <td>{{ formatDate(appt.datetime) }}</td>
+                                    <td class="patient-cell">{{ appt.patientName }}</td>
+                                    <td>{{ appt.practitionerName }}</td>
+                                    <td class="reason-cell">{{ appt.reason || '-' }}</td>
+                                    <td>
+                                        <span class="badge" [class]="getStatusClass(appt.status)">
+                                            {{ appt.status }}
+                                        </span>
+                                    </td>
+                                    <td class="actions-cell">
+                                        @if (appt.status === 'PENDING') {
+                                            <button
+                                                class="btn btn-confirm btn-sm"
+                                                (click)="confirmAppointment(appt.appointmentId)"
+                                                title="Confirm appointment"
+                                            >
+                                                Confirm
+                                            </button>
+                                        }
+                                        @if (appt.status === 'PENDING' || appt.status === 'CONFIRMED') {
+                                            <button
+                                                class="btn btn-cancel btn-sm"
+                                                (click)="cancelAppointment(appt.appointmentId)"
+                                                title="Cancel appointment"
+                                            >
+                                                Cancel
+                                            </button>
+                                        }
+                                        @if (appt.status === 'COMPLETED') {
+                                            <button
+                                                class="btn btn-confirm btn-sm"
+                                                (click)="generateInvoice(appt.appointmentId)"
+                                                title="Generate invoice from performed acts"
+                                            >
+                                                Generate Invoice
+                                            </button>
+                                        }
+                                        @if (appt.status === 'CANCELLED' || appt.status === 'INVOICED' || appt.status === 'PAID') {
+                                            <span class="no-actions">-</span>
+                                        }
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="table-footer">
+                    <span>Showing {{ filteredAppointments.length }} appointment{{ filteredAppointments.length !== 1 ? 's' : '' }}</span>
+                </div>
+            }
+        </div>
+    }
+</div>
