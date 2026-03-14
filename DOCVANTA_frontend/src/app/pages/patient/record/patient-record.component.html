@@ -1,0 +1,97 @@
+<div class="patient-record">
+    @if (loading) {
+        <div class="loading-spinner">
+            <div class="spinner"></div>
+            <p>Loading medical record...</p>
+        </div>
+    } @else if (errorMessage) {
+        <div class="error-state">
+            <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+            <p>{{ errorMessage }}</p>
+            <button class="btn-retry" (click)="loadRecord()">Try Again</button>
+        </div>
+    } @else if (noRecord) {
+        <div class="empty-state">
+            <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1" ry="1"/></svg>
+            <h3>No Medical Record</h3>
+            <p>Your medical record has not been created yet. Please contact your doctor or the clinic staff.</p>
+        </div>
+    } @else {
+        <div class="record-header">
+            <div class="record-title">
+                <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1" ry="1"/></svg>
+                <div>
+                    <h2>Medical Record</h2>
+                    <span class="patient-name">{{ record.patientName }}</span>
+                </div>
+            </div>
+            <span class="record-id">Record #{{ record.recordId }}</span>
+        </div>
+
+        <div class="record-grid">
+            <!-- Blood Type -->
+            <div class="record-card blood-type-card">
+                <div class="card-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"/></svg>
+                </div>
+                <div class="card-content">
+                    <span class="card-label">Blood Type</span>
+                    <span class="blood-type-value">{{ record.bloodType || 'Not specified' }}</span>
+                </div>
+            </div>
+
+            <!-- Allergies -->
+            <div class="record-card">
+                <div class="card-header">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+                    <h3>Allergies</h3>
+                </div>
+                <div class="card-body">
+                    @if (getAllergiesList().length === 0) {
+                        <p class="no-data">No known allergies</p>
+                    } @else {
+                        <div class="tag-list">
+                            @for (allergy of getAllergiesList(); track allergy) {
+                                <span class="tag tag-danger">{{ allergy }}</span>
+                            }
+                        </div>
+                    }
+                </div>
+            </div>
+
+            <!-- Chronic Diseases -->
+            <div class="record-card">
+                <div class="card-header">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+                    <h3>Chronic Diseases</h3>
+                </div>
+                <div class="card-body">
+                    @if (getChronicDiseasesList().length === 0) {
+                        <p class="no-data">No chronic diseases recorded</p>
+                    } @else {
+                        <div class="tag-list">
+                            @for (disease of getChronicDiseasesList(); track disease) {
+                                <span class="tag tag-warning">{{ disease }}</span>
+                            }
+                        </div>
+                    }
+                </div>
+            </div>
+
+            <!-- Notes -->
+            <div class="record-card full-width">
+                <div class="card-header">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+                    <h3>Notes</h3>
+                </div>
+                <div class="card-body">
+                    @if (record.notes) {
+                        <p class="notes-text">{{ record.notes }}</p>
+                    } @else {
+                        <p class="no-data">No additional notes</p>
+                    }
+                </div>
+            </div>
+        </div>
+    }
+</div>
