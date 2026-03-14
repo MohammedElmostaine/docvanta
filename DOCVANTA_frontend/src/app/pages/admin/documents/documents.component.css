@@ -1,0 +1,97 @@
+/* Import shared management styles */
+.management-page { display: flex; flex-direction: column; gap: 1.5rem; }
+.page-header { display: flex; justify-content: space-between; align-items: flex-start; }
+.page-header h2 { font-size: 1.75rem; font-weight: 700; color: var(--color-neutral-900); }
+.subtitle { color: var(--color-neutral-500); margin-top: 0.25rem; font-size: 0.925rem; }
+
+.toolbar { display: flex; align-items: center; justify-content: space-between; gap: 1rem; flex-wrap: wrap; }
+.search-box { display: flex; align-items: center; gap: 0.5rem; background: white; border: 2px solid var(--color-neutral-200); border-radius: 10px; padding: 0.5rem 1rem; flex: 1; max-width: 400px; transition: border-color 0.2s; }
+.search-box:focus-within { border-color: var(--color-primary-400); }
+.search-box svg { color: var(--color-neutral-400); flex-shrink: 0; }
+.search-input { border: none; outline: none; flex: 1; font-size: 0.925rem; color: var(--color-neutral-800); background: transparent; }
+.search-input::placeholder { color: var(--color-neutral-400); }
+.count-badge { font-size: 0.8rem; font-weight: 600; color: var(--color-neutral-500); background: var(--color-neutral-100); padding: 0.35rem 0.75rem; border-radius: 9999px; }
+
+.toolbar-filters { display: flex; align-items: center; gap: 0.75rem; }
+.filter-select { padding: 0.5rem 0.75rem; border: 2px solid var(--color-neutral-200); border-radius: 8px; font-size: 0.8rem; color: var(--color-neutral-700); background: white; outline: none; cursor: pointer; }
+.filter-select:focus { border-color: var(--color-primary-400); }
+
+.add-btn { display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.625rem 1.25rem; background: var(--bg-gradient); color: white; border-radius: 10px; font-weight: 600; font-size: 0.875rem; border: none; cursor: pointer; transition: transform 0.2s, box-shadow 0.2s; }
+.add-btn:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(13, 148, 136, 0.3); }
+
+.error-banner { background: #fef2f2; color: #991b1b; padding: 0.75rem 1rem; border-radius: 10px; font-size: 0.875rem; border: 1px solid #fecaca; }
+.loading-state, .empty-state { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 4rem 2rem; gap: 1rem; color: var(--color-neutral-400); background: white; border-radius: 16px; border: 1px solid var(--color-neutral-200); }
+.empty-state h3 { color: var(--color-neutral-600); font-size: 1.125rem; }
+.empty-state p { color: var(--color-neutral-400); font-size: 0.875rem; }
+.spinner { width: 32px; height: 32px; border: 3px solid var(--color-neutral-200); border-top-color: var(--color-primary-600); border-radius: 50%; animation: spin 0.8s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* Table */
+.table-container { background: white; border-radius: 16px; border: 1px solid var(--color-neutral-200); overflow: hidden; }
+.table-responsive { overflow-x: auto; }
+.data-table { width: 100%; border-collapse: collapse; }
+.data-table th { text-align: left; padding: 0.875rem 1.25rem; font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: var(--color-neutral-500); background: var(--color-neutral-50); border-bottom: 2px solid var(--color-neutral-200); }
+.data-table td { padding: 0.875rem 1.25rem; font-size: 0.875rem; color: var(--color-neutral-700); border-bottom: 1px solid var(--color-neutral-100); }
+.data-table tbody tr:hover { background: var(--color-neutral-50); }
+.actions-cell { display: flex; gap: 0.25rem; }
+
+.icon-btn { width: 32px; height: 32px; border-radius: 8px; display: flex; align-items: center; justify-content: center; border: none; background: none; cursor: pointer; color: var(--color-neutral-400); transition: all 0.15s; }
+.icon-btn:hover { background: var(--color-neutral-100); color: var(--color-neutral-700); }
+.delete-btn:hover { background: #fef2f2; color: #ef4444; }
+
+/* Type badges */
+.type-badge { display: inline-flex; padding: 0.25rem 0.75rem; border-radius: 9999px; font-size: 0.7rem; font-weight: 600; text-transform: uppercase; }
+.type-certificate { background: #dbeafe; color: #1d4ed8; }
+.type-prescription { background: #d1fae5; color: #065f46; }
+.type-report { background: #fef3c7; color: #92400e; }
+
+/* Auth toggle */
+.auth-toggle { padding: 0.2rem 0.6rem; border-radius: 9999px; font-size: 0.7rem; font-weight: 600; border: none; cursor: pointer; background: #fee2e2; color: #991b1b; transition: all 0.2s; }
+.auth-toggle.authorized { background: #d1fae5; color: #065f46; }
+
+/* Status badges */
+.status-badge { display: inline-flex; padding: 0.2rem 0.6rem; border-radius: 9999px; font-size: 0.7rem; font-weight: 600; text-transform: uppercase; }
+.status-active { background: #d1fae5; color: #065f46; }
+.status-inactive { background: #fee2e2; color: #991b1b; }
+
+/* Modal */
+.modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center; z-index: 1000; padding: 1rem; }
+.modal { background: white; border-radius: 16px; width: 100%; max-width: 600px; max-height: 90vh; overflow-y: auto; box-shadow: 0 25px 50px rgba(0,0,0,0.15); }
+.preview-modal { max-width: 700px; }
+.modal-header { display: flex; justify-content: space-between; align-items: center; padding: 1.5rem; border-bottom: 1px solid var(--color-neutral-200); }
+.modal-header h3 { font-size: 1.125rem; font-weight: 700; }
+.modal-close { width: 32px; height: 32px; border-radius: 8px; display: flex; align-items: center; justify-content: center; border: none; background: none; cursor: pointer; color: var(--color-neutral-400); font-size: 1.5rem; }
+.modal-close:hover { background: var(--color-neutral-100); color: var(--color-neutral-700); }
+.modal-body { padding: 1.5rem; display: flex; flex-direction: column; gap: 1rem; }
+.modal-footer { display: flex; justify-content: flex-end; gap: 0.75rem; padding: 1.25rem 1.5rem; border-top: 1px solid var(--color-neutral-200); }
+
+.preview-actions { display: flex; align-items: center; gap: 0.5rem; }
+
+.form-group { display: flex; flex-direction: column; gap: 0.375rem; }
+.form-group label { font-size: 0.8rem; font-weight: 600; color: var(--color-neutral-600); }
+.form-group input, .form-group select, .form-group textarea { padding: 0.625rem 0.875rem; border: 2px solid var(--color-neutral-200); border-radius: 8px; font-size: 0.875rem; color: var(--color-neutral-800); outline: none; transition: border-color 0.2s; font-family: inherit; }
+.form-group input:focus, .form-group select:focus, .form-group textarea:focus { border-color: var(--color-primary-400); }
+.form-group textarea { resize: vertical; min-height: 120px; }
+.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+
+.checkbox-label { display: flex; align-items: center; gap: 0.5rem; font-size: 0.875rem; color: var(--color-neutral-700); cursor: pointer; }
+.checkbox-label input[type="checkbox"] { width: 18px; height: 18px; accent-color: var(--color-primary-600); }
+
+.btn-cancel { padding: 0.5rem 1.25rem; border-radius: 8px; font-weight: 600; font-size: 0.875rem; color: var(--color-neutral-600); background: var(--color-neutral-100); border: none; cursor: pointer; }
+.btn-cancel:hover { background: var(--color-neutral-200); }
+.btn-save { display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.5rem 1.25rem; border-radius: 8px; font-weight: 600; font-size: 0.875rem; color: white; background: var(--bg-gradient); border: none; cursor: pointer; }
+.btn-save:hover { box-shadow: 0 4px 12px rgba(13, 148, 136, 0.3); }
+
+/* Document Preview */
+.document-preview { font-size: 0.925rem; }
+.doc-header-info { display: flex; flex-direction: column; gap: 0.25rem; }
+.doc-header-info p { color: var(--color-neutral-600); font-size: 0.85rem; }
+.doc-header-info strong { color: var(--color-neutral-800); }
+.doc-content { white-space: pre-wrap; color: var(--color-neutral-800); line-height: 1.7; padding: 1rem 0; }
+
+@media (max-width: 768px) {
+    .toolbar { flex-direction: column; align-items: stretch; }
+    .search-box { max-width: 100%; }
+    .form-row { grid-template-columns: 1fr; }
+    .toolbar-filters { justify-content: space-between; }
+}
