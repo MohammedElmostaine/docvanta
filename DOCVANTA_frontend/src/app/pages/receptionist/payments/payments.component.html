@@ -1,0 +1,295 @@
+<div class="payments-container">
+    <div class="page-header">
+        <h1>Payments</h1>
+        <p class="subtitle">Record payments and view transaction history</p>
+    </div>
+
+    @if (successMessage) {
+        <div class="alert alert-success">
+            <span class="alert-icon">&#10003;</span>
+            {{ successMessage }}
+        </div>
+    }
+
+    @if (error) {
+        <div class="alert alert-error">
+            <span class="alert-icon">&#9888;</span>
+            {{ error }}
+            <button class="btn-retry" (click)="loadData()">Retry</button>
+        </div>
+    }
+
+    <!-- Summary Cards -->
+    <div class="summary-cards">
+        <div class="summary-card card-total">
+            <div class="card-label">Today's Revenue</div>
+            <div class="card-value">{{ formatCurrency(totalToday) }}</div>
+        </div>
+        <div class="summary-card card-cash">
+            <div class="card-label">Cash</div>
+            <div class="card-value">{{ formatCurrency(cashTotal) }}</div>
+        </div>
+        <div class="summary-card card-card">
+            <div class="card-label">Card</div>
+            <div class="card-value">{{ formatCurrency(cardTotal) }}</div>
+        </div>
+        <div class="summary-card card-pending">
+            <div class="card-label">Awaiting Payment</div>
+            <div class="card-value">{{ unpaidInvoices.length }}</div>
+        </div>
+    </div>
+
+    <!-- Tabs -->
+    <div class="tabs">
+        <button class="tab" [class.active]="activeTab === 'unpaid'" (click)="activeTab = 'unpaid'">
+            Unpaid Invoices
+            @if (unpaidInvoices.length > 0) {
+                <span class="tab-badge">{{ unpaidInvoices.length }}</span>
+            }
+        </button>
+        <button class="tab" [class.active]="activeTab === 'history'" (click)="activeTab = 'history'">
+            Payment History
+        </button>
+    </div>
+
+    @if (loading) {
+        <div class="loading-container">
+            <div class="spinner"></div>
+            <p>Loading...</p>
+        </div>
+    } @else {
+
+        <!-- ═══ TAB: Unpaid Invoices ═══ -->
+        @if (activeTab === 'unpaid') {
+            <div class="table-card">
+                @if (unpaidInvoices.length === 0) {
+                    <div class="empty-state">
+                        <div class="empty-icon">&#10004;</div>
+                        <p>All invoices are paid. Nothing pending.</p>
+                    </div>
+                } @else {
+                    <div class="table-responsive">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Invoice #</th>
+                                    <th>Patient</th>
+                                    <th>Date</th>
+                                    <th>Total</th>
+                                    <th>Paid</th>
+                                    <th>Remaining</th>
+                                    <th>Progress</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @for (inv of unpaidInvoices; track inv.invoiceId) {
+                                    <tr>
+                                        <td class="invoice-cell">{{ inv.invoiceNumber }}</td>
+                                        <td class="patient-cell">{{ inv.patientName }}</td>
+                                        <td>{{ formatDate(inv.createdAt) }}</td>
+                                        <td class="amount-cell">{{ formatCurrency(inv.totalAmount) }}</td>
+                                        <td class="amount-cell paid">{{ formatCurrency(inv.paidAmount) }}</td>
+                                        <td class="amount-cell remaining">{{ formatCurrency(inv.remainingAmount) }}</td>
+                                        <td>
+                                            <div class="progress-bar">
+                                                <div class="progress-fill" [style.width.%]="getProgressPercent(inv)"></div>
+                                            </div>
+                                            <span class="progress-text">{{ getProgressPercent(inv) }}%</span>
+                                        </td>
+                                        <td>
+                                            <button class="btn btn-pay btn-sm" (click)="openPaymentModal(inv)">
+                                                Record Payment
+                                            </button>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                }
+            </div>
+        }
+
+        <!-- ═══ TAB: Payment History ═══ -->
+        @if (activeTab === 'history') {
+            <div class="filters-card">
+                <div class="filters-row">
+                    <div class="filter-group">
+                        <label for="dateFilter">Date</label>
+                        <div class="date-filter-row">
+                            <input type="date" id="dateFilter" [(ngModel)]="selectedDate" (change)="onFilterChange()" class="filter-input" />
+                            @if (selectedDate) {
+                                <button class="btn btn-outline btn-sm" (click)="clearDateFilter()">Clear</button>
+                            }
+                        </div>
+                    </div>
+                    <div class="filter-group">
+                        <label for="methodFilter">Payment Method</label>
+                        <select id="methodFilter" [(ngModel)]="selectedMethod" (change)="onFilterChange()" class="filter-input">
+                            @for (method of methods; track method) {
+                                <option [value]="method">{{ method === 'ALL' ? 'All Methods' : getMethodLabel(method) }}</option>
+                            }
+                        </select>
+                    </div>
+                    <div class="filter-group filter-actions">
+                        <button class="btn btn-secondary" (click)="loadData()">
+                            <span class="btn-icon">&#8635;</span> Refresh
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="table-card">
+                @if (filteredPayments.length === 0) {
+                    <div class="empty-state">
+                        <div class="empty-icon">&#128179;</div>
+                        <p>No payments recorded yet.</p>
+                    </div>
+                } @else {
+                    <div class="table-responsive">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Date</th>
+                                    <th>Invoice #</th>
+                                    <th>Patient</th>
+                                    <th>Amount</th>
+                                    <th>Method</th>
+                                    <th>Received By</th>
+                                    <th>Reference</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @for (payment of filteredPayments; track payment.paymentId) {
+                                    <tr>
+                                        <td>{{ formatDateTime(payment.paymentDate) }}</td>
+                                        <td class="invoice-cell">{{ payment.invoiceNumber }}</td>
+                                        <td class="patient-cell">{{ payment.patientName || '-' }}</td>
+                                        <td class="amount-cell">{{ formatCurrency(payment.amount) }}</td>
+                                        <td>
+                                            <span class="badge" [class]="getMethodClass(payment.paymentMethod)">
+                                                {{ getMethodLabel(payment.paymentMethod) }}
+                                            </span>
+                                        </td>
+                                        <td>{{ payment.receivedByName || '-' }}</td>
+                                        <td class="ref-cell">{{ payment.reference || '-' }}</td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="table-footer">
+                        <span>{{ filteredPayments.length }} payment{{ filteredPayments.length !== 1 ? 's' : '' }}</span>
+                    </div>
+                }
+            </div>
+        }
+    }
+</div>
+
+<!-- ═══ Payment Modal ═══ -->
+@if (showPaymentModal && selectedInvoice) {
+    <div class="modal-overlay" (click)="closePaymentModal()">
+        <div class="modal-content" (click)="$event.stopPropagation()">
+            <div class="modal-header">
+                <h2>Record Payment</h2>
+                <button class="modal-close" (click)="closePaymentModal()">&times;</button>
+            </div>
+
+            <div class="modal-body">
+                <!-- Invoice Summary -->
+                <div class="invoice-summary">
+                    <div class="summary-row">
+                        <span class="label">Invoice</span>
+                        <span class="value">{{ selectedInvoice.invoiceNumber }}</span>
+                    </div>
+                    <div class="summary-row">
+                        <span class="label">Patient</span>
+                        <span class="value">{{ selectedInvoice.patientName }}</span>
+                    </div>
+                    <div class="summary-row">
+                        <span class="label">Total</span>
+                        <span class="value">{{ formatCurrency(selectedInvoice.totalAmount) }}</span>
+                    </div>
+                    @if (selectedInvoice.paidAmount > 0) {
+                        <div class="summary-row">
+                            <span class="label">Already Paid</span>
+                            <span class="value paid">{{ formatCurrency(selectedInvoice.paidAmount) }}</span>
+                        </div>
+                    }
+                    <div class="summary-row highlight">
+                        <span class="label">Remaining</span>
+                        <span class="value remaining">{{ formatCurrency(selectedInvoice.remainingAmount) }}</span>
+                    </div>
+                </div>
+
+                <!-- Line Items -->
+                @if (selectedInvoice.lines?.length) {
+                    <div class="line-items">
+                        <h4>Services</h4>
+                        @for (line of selectedInvoice.lines; track line.lineId) {
+                            <div class="line-item">
+                                <span class="line-name">{{ line.medicalActName || line.description }}</span>
+                                <span class="line-qty">x{{ line.quantity }}</span>
+                                <span class="line-price">{{ formatCurrency(line.lineTotal) }}</span>
+                            </div>
+                        }
+                    </div>
+                }
+
+                @if (paymentError) {
+                    <div class="alert alert-error modal-error">{{ paymentError }}</div>
+                }
+
+                <!-- Payment Form -->
+                <div class="payment-form">
+                    <div class="form-group">
+                        <label for="payAmount">Amount (MAD)</label>
+                        <div class="amount-input-row">
+                            <input type="number" id="payAmount" [(ngModel)]="paymentAmount"
+                                   [max]="selectedInvoice.remainingAmount" min="0.01" step="0.01"
+                                   class="form-input amount-input" />
+                            <button class="btn btn-outline btn-sm" (click)="payFull()">Pay Full</button>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Payment Method</label>
+                        <div class="method-options">
+                            @for (m of methods.slice(1); track m) {
+                                <label class="method-option" [class.selected]="paymentMethod === m">
+                                    <input type="radio" name="payMethod" [value]="m" [(ngModel)]="paymentMethod" />
+                                    {{ getMethodLabel(m) }}
+                                </label>
+                            }
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="payRef">Reference (optional)</label>
+                        <input type="text" id="payRef" [(ngModel)]="paymentReference"
+                               placeholder="Receipt #, check #, etc." class="form-input" />
+                    </div>
+
+                    <div class="form-group">
+                        <label for="payNotes">Notes (optional)</label>
+                        <input type="text" id="payNotes" [(ngModel)]="paymentNotes"
+                               placeholder="Additional notes" class="form-input" />
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal-footer">
+                <button class="btn btn-secondary" (click)="closePaymentModal()">Cancel</button>
+                <button class="btn btn-pay" (click)="submitPayment()" [disabled]="submitting">
+                    @if (submitting) {
+                        Processing...
+                    } @else {
+                        Confirm Payment of {{ formatCurrency(paymentAmount) }}
+                    }
+                </button>
+            </div>
+        </div>
+    </div>
+}
