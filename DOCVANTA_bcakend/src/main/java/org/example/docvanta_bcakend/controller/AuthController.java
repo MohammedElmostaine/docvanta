@@ -40,3 +40,4 @@ public class AuthController {
         return ResponseEntity.ok(ApiResponse.success("User created successfully", created));
     }
 }
+
