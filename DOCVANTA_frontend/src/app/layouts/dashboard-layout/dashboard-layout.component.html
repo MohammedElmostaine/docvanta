@@ -1,0 +1,91 @@
+<div class="dashboard-shell" [class.sidebar-collapsed]="sidebarCollapsed">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <a routerLink="/" class="sidebar-logo">
+                <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
+                    <rect width="32" height="32" rx="8" fill="white"/>
+                    <path d="M16 8V24M8 16H24" stroke="#0d9488" stroke-width="3" stroke-linecap="round"/>
+                </svg>
+                @if (!sidebarCollapsed) {
+                    <span class="logo-text">DocVanta</span>
+                }
+            </a>
+            <button class="sidebar-toggle" (click)="toggleSidebar()">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    @if (sidebarCollapsed) {
+                        <polyline points="9 18 15 12 9 6"/>
+                    } @else {
+                        <polyline points="15 18 9 12 15 6"/>
+                    }
+                </svg>
+            </button>
+        </div>
+
+        <nav class="sidebar-nav">
+            @for (item of navItems; track item.route) {
+                <a [routerLink]="item.route" routerLinkActive="active" [routerLinkActiveOptions]="{exact: item.route === '/admin' || item.route === '/doctor' || item.route === '/patient'}" class="nav-item" [title]="item.label">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" [innerHTML]="getIconSvg(item.icon)">
+                    </svg>
+                    @if (!sidebarCollapsed) {
+                        <span class="nav-label">{{ item.label }}</span>
+                    }
+                </a>
+            }
+        </nav>
+
+        <div class="sidebar-footer">
+            <button class="nav-item logout-btn" (click)="logout()" title="Logout">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+                    <polyline points="16 17 21 12 16 7"/>
+                    <line x1="21" y1="12" x2="9" y2="12"/>
+                </svg>
+                @if (!sidebarCollapsed) {
+                    <span class="nav-label">Logout</span>
+                }
+            </button>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <div class="main-area">
+        <!-- Top Bar -->
+        <header class="topbar">
+            <div class="topbar-left">
+                <button class="mobile-menu-btn" (click)="toggleSidebar()">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="3" y1="12" x2="21" y2="12"/>
+                        <line x1="3" y1="6" x2="21" y2="6"/>
+                        <line x1="3" y1="18" x2="21" y2="18"/>
+                    </svg>
+                </button>
+                <h1 class="page-title">
+                    @if (user?.role === 'SYSTEM_ADMINISTRATOR') { Admin Panel }
+                    @else if (user?.role === 'PRACTITIONER') { Practitioner Portal }
+                    @else if (user?.role === 'PATIENT') { Patient Portal }
+                    @else if (user?.role === 'RECEPTIONIST') { Reception }
+                    @else { {{ getPersonnelLabel() }} Portal }
+                </h1>
+            </div>
+            <div class="topbar-right">
+                <div class="user-menu" (click)="toggleUserMenu()">
+                    <div class="user-avatar">
+                        {{ user?.username?.charAt(0)?.toUpperCase() || 'U' }}
+                    </div>
+                    @if (!sidebarCollapsed) {
+                        <div class="user-info">
+                            <span class="user-name">{{ user?.username }}</span>
+                            <span class="user-role">{{ getPersonnelLabel() }}</span>
+                        </div>
+                    }
+                </div>
+            </div>
+        </header>
+
+        <!-- Page Content -->
+        <main class="page-content">
+            <router-outlet></router-outlet>
+        </main>
+    </div>
+</div>
