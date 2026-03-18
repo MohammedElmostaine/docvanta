@@ -1,0 +1,184 @@
+<div class="medical-acts-container">
+    <!-- Header -->
+    <div class="page-header">
+        <h1>Medical Acts Catalog</h1>
+        @if (isAdmin) {
+            <button class="btn btn-primary" (click)="openCreateModal()">+ Add New Act</button>
+        }
+    </div>
+
+    <!-- Messages -->
+    @if (successMessage) {
+        <div class="alert alert-success">
+            {{ successMessage }}
+            <button class="alert-close" (click)="successMessage = ''">&times;</button>
+        </div>
+    }
+    @if (errorMessage) {
+        <div class="alert alert-error">
+            {{ errorMessage }}
+            <button class="alert-close" (click)="errorMessage = ''">&times;</button>
+        </div>
+    }
+
+    <!-- Filters -->
+    <div class="filters-bar">
+        <input
+            type="text"
+            class="filter-input"
+            placeholder="Search by code, name or description..."
+            [(ngModel)]="searchQuery"
+            (input)="onSearch()"
+        />
+        <select class="filter-select" [(ngModel)]="selectedCategory" (change)="onCategoryChange()">
+            <option value="ALL">All Categories</option>
+            @for (cat of categories; track cat) {
+                <option [value]="cat">{{ cat.replace('_', ' ') }}</option>
+            }
+        </select>
+    </div>
+
+    <!-- Loading -->
+    @if (loading) {
+        <div class="loading-container">
+            <div class="spinner"></div>
+            <p>Loading medical acts...</p>
+        </div>
+    }
+
+    <!-- Table -->
+    @if (!loading) {
+        @if (filteredActs.length === 0) {
+            <div class="empty-state">
+                <p>No medical acts found.</p>
+            </div>
+        } @else {
+            <div class="table-wrapper">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Code</th>
+                            <th>Name</th>
+                            <th>Category</th>
+                            <th>Price</th>
+                            <th>Status</th>
+                            @if (isAdmin) { <th>Actions</th> }
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @for (act of filteredActs; track act.medicalActId) {
+                            <tr>
+                                <td class="code-cell">{{ act.code }}</td>
+                                <td>{{ act.name }}</td>
+                                <td>
+                                    <span
+                                        class="category-badge"
+                                        [style.background-color]="getCategoryColor(act.category) + '18'"
+                                        [style.color]="getCategoryColor(act.category)"
+                                        [style.border-color]="getCategoryColor(act.category) + '40'"
+                                    >
+                                        {{ act.categoryDisplayName || act.category.replace('_', ' ') }}
+                                    </span>
+                                </td>
+                                <td class="price-cell">{{ formatPrice(act.basePrice) }}</td>
+                                <td>
+                                    @if (act.active) {
+                                        <span class="status-badge status-active">Active</span>
+                                    } @else {
+                                        <span class="status-badge status-inactive">Inactive</span>
+                                    }
+                                </td>
+                                @if (isAdmin) {
+                                    <td class="actions-cell">
+                                        <button class="btn btn-sm btn-edit" (click)="openEditModal(act)">Edit</button>
+                                        <button class="btn btn-sm btn-delete" (click)="deleteAct(act)">Delete</button>
+                                    </td>
+                                }
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        }
+    }
+
+    <!-- Create/Edit Modal -->
+    @if (showModal) {
+        <div class="modal-overlay" (click)="closeModal()">
+            <div class="modal-content" (click)="$event.stopPropagation()">
+                <div class="modal-header">
+                    <h2>{{ editingAct ? 'Edit Medical Act' : 'Create Medical Act' }}</h2>
+                    <button class="modal-close" (click)="closeModal()">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label for="actCode">Code</label>
+                        <input
+                            type="text"
+                            id="actCode"
+                            [(ngModel)]="form.code"
+                            (input)="onCodeInput()"
+                            placeholder="e.g. CONS-001"
+                            required
+                        />
+                    </div>
+                    <div class="form-group">
+                        <label for="actName">Name</label>
+                        <input
+                            type="text"
+                            id="actName"
+                            [(ngModel)]="form.name"
+                            placeholder="e.g. General Consultation"
+                            required
+                        />
+                    </div>
+                    <div class="form-group">
+                        <label for="actDescription">Description</label>
+                        <textarea
+                            id="actDescription"
+                            [(ngModel)]="form.description"
+                            rows="3"
+                            placeholder="Describe this medical act..."
+                        ></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="actCategory">Category</label>
+                        <select id="actCategory" [(ngModel)]="form.category" required>
+                            @for (cat of categories; track cat) {
+                                <option [value]="cat">{{ cat.replace('_', ' ') }}</option>
+                            }
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="actPrice">Base Price (MAD)</label>
+                        <input
+                            type="number"
+                            id="actPrice"
+                            [(ngModel)]="form.basePrice"
+                            min="0"
+                            step="0.01"
+                            placeholder="0.00"
+                            required
+                        />
+                    </div>
+                    <div class="form-group form-group-checkbox">
+                        <label>
+                            <input type="checkbox" [(ngModel)]="form.active" />
+                            Active
+                        </label>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" (click)="closeModal()">Cancel</button>
+                    <button
+                        class="btn btn-primary"
+                        (click)="saveAct()"
+                        [disabled]="!form.code || !form.name || !form.category"
+                    >
+                        {{ editingAct ? 'Update' : 'Save' }}
+                    </button>
+                </div>
+            </div>
+        </div>
+    }
+</div>
