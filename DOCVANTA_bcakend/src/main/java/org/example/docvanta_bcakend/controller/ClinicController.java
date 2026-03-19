@@ -65,3 +65,4 @@ public class ClinicController {
         return ResponseEntity.ok(ApiResponse.success("Clinic deleted successfully", null));
     }
 }
+
