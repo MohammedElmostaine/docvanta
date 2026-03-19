@@ -1,0 +1,159 @@
+<div class="receptionist-dashboard">
+    @if (loading) {
+        <div class="loading-spinner">
+            <div class="spinner"></div>
+            <p>Loading dashboard...</p>
+        </div>
+    } @else {
+        <!-- Header -->
+        <div class="dashboard-header">
+            <div>
+                <h1>Reception Dashboard</h1>
+                <p class="welcome-text">Welcome back, <strong>{{ user?.username }}</strong></p>
+            </div>
+        </div>
+
+        <!-- Stats Cards -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-icon appointments">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                </div>
+                <div class="stat-info">
+                    <span class="stat-number">{{ stats.todayAppointments }}</span>
+                    <span class="stat-label">Today's Appointments</span>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon unpaid">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="18" x2="12" y2="12"/><line x1="9" y1="15" x2="15" y2="15"/></svg>
+                </div>
+                <div class="stat-info">
+                    <span class="stat-number">{{ stats.unpaidInvoices }}</span>
+                    <span class="stat-label">Unpaid Invoices</span>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon revenue">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+                </div>
+                <div class="stat-info">
+                    <span class="stat-number">{{ formatCurrency(stats.todayRevenue) }}</span>
+                    <span class="stat-label">Today's Revenue</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="dashboard-grid">
+            <!-- Today's Appointments Table -->
+            <div class="card full-width">
+                <div class="card-header">
+                    <h3>Today's Appointments</h3>
+                    <a routerLink="/receptionist/appointments" class="view-all">View All</a>
+                </div>
+                <div class="card-body">
+                    @if (todayAppointments.length === 0) {
+                        <p class="empty-text">No appointments scheduled for today</p>
+                    } @else {
+                        <div class="table-responsive">
+                            <table class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th>Time</th>
+                                        <th>Patient</th>
+                                        <th>Practitioner</th>
+                                        <th>Status</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @for (apt of todayAppointments; track apt.appointmentId) {
+                                        <tr class="clickable" (click)="openAppointmentDetail(apt)">
+                                            <td class="time-cell">{{ formatTime(apt.datetime) }}</td>
+                                            <td>{{ apt.patientName || 'N/A' }}</td>
+                                            <td>{{ apt.practitionerName || 'N/A' }}</td>
+                                            <td><span class="badge" [class]="getStatusClass(apt.status)">{{ apt.status }}</span></td>
+                                            <td>
+                                                @if (apt.status === 'PENDING' || apt.status === 'CONFIRMED') {
+                                                    <button class="btn-check-in" (click)="checkIn(apt); $event.stopPropagation()">Check In</button>
+                                                } @else {
+                                                    <span class="text-muted">--</span>
+                                                }
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    }
+                </div>
+            </div>
+
+            <!-- Recent Unpaid Invoices -->
+            <div class="card">
+                <div class="card-header">
+                    <h3>Unpaid Invoices</h3>
+                    <a routerLink="/receptionist/invoices" class="view-all">View All</a>
+                </div>
+                <div class="card-body">
+                    @if (unpaidInvoices.length === 0) {
+                        <p class="empty-text">No unpaid invoices</p>
+                    } @else {
+                        <div class="invoice-list">
+                            @for (inv of unpaidInvoices.slice(0, 5); track inv.invoiceId) {
+                                <div class="invoice-item">
+                                    <div class="invoice-main">
+                                        <span class="invoice-number">{{ inv.invoiceNumber }}</span>
+                                        <span class="invoice-patient">{{ inv.patientName }}</span>
+                                    </div>
+                                    <div class="invoice-amounts">
+                                        <span class="invoice-total">{{ formatCurrency(inv.totalAmount) }}</span>
+                                        <span class="invoice-remaining">Remaining: {{ formatCurrency(inv.remainingAmount) }}</span>
+                                    </div>
+                                    <span class="badge" [class]="getInvoiceStatusClass(inv.status)">{{ inv.status }}</span>
+                                </div>
+                            }
+                        </div>
+                    }
+                </div>
+            </div>
+
+            <!-- Quick Actions -->
+            <div class="card">
+                <div class="card-header">
+                    <h3>Quick Actions</h3>
+                </div>
+                <div class="card-body">
+                    <div class="quick-actions-grid">
+                        <a routerLink="/receptionist/invoices" class="action-card">
+                            <div class="action-icon invoice-icon">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="18" x2="12" y2="12"/><line x1="9" y1="15" x2="15" y2="15"/></svg>
+                            </div>
+                            <span class="action-label">New Invoice</span>
+                        </a>
+                        <a routerLink="/receptionist/appointments" class="action-card">
+                            <div class="action-icon appointment-icon">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                            </div>
+                            <span class="action-label">Manage Appointments</span>
+                        </a>
+                        <a routerLink="/receptionist/medical-acts" class="action-card">
+                            <div class="action-icon medical-icon">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+                            </div>
+                            <span class="action-label">Medical Acts Catalog</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+
+    <app-appointment-detail-modal
+        [appointment]="selectedAppointment"
+        [role]="'RECEPTIONIST'"
+        [processing]="processingAction"
+        (close)="closeAppointmentDetail()"
+        (action)="onAppointmentAction($event)"
+    />
+</div>
