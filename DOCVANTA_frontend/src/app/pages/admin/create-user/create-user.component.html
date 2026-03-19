@@ -1,0 +1,260 @@
+<div class="create-user-page">
+    <div class="page-header">
+        <div class="header-row">
+            <div>
+                <h2>User Management</h2>
+                <p class="subtitle">Create and manage all user accounts</p>
+            </div>
+            <button class="btn-primary" (click)="showCreateForm = !showCreateForm">
+                @if (showCreateForm) {
+                    Close Form
+                } @else {
+                    + New User
+                }
+            </button>
+        </div>
+    </div>
+
+    <!-- Alerts -->
+    @if (successMessage) {
+    <div class="alert alert-success">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+            <polyline points="22 4 12 14.01 9 11.01"/>
+        </svg>
+        <span>{{ successMessage }}</span>
+    </div>
+    }
+    @if (errorMessage) {
+    <div class="alert alert-error">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="10"/>
+            <line x1="15" y1="9" x2="9" y2="15"/>
+            <line x1="9" y1="9" x2="15" y2="15"/>
+        </svg>
+        <span>{{ errorMessage }}</span>
+    </div>
+    }
+
+    <!-- Create Form (collapsible) -->
+    @if (showCreateForm) {
+    <div class="form-card">
+        <h3>Create New User</h3>
+        <form [formGroup]="userForm" (ngSubmit)="onSubmit()">
+            <div class="form-row">
+                <div class="form-group">
+                    <label class="form-label">Role <span class="required">*</span></label>
+                    <select formControlName="role" class="form-input" [class.error]="isFieldInvalid('role')">
+                        <option value="" disabled>Select a role</option>
+                        @for (r of roles; track r.value) {
+                        <option [value]="r.value">{{ r.label }}</option>
+                        }
+                    </select>
+                    @if (isFieldInvalid('role')) {
+                    <span class="field-error">Role is required</span>
+                    }
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Username <span class="required">*</span></label>
+                    <input type="text" formControlName="username" class="form-input"
+                        [class.error]="isFieldInvalid('username')" placeholder="Username (min 3 chars)"/>
+                    @if (isFieldInvalid('username')) {
+                    <span class="field-error">Username is required (min 3 characters)</span>
+                    }
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label class="form-label">First Name <span class="required">*</span></label>
+                    <input type="text" formControlName="firstName" class="form-input"
+                        [class.error]="isFieldInvalid('firstName')" placeholder="First name"/>
+                    @if (isFieldInvalid('firstName')) {
+                    <span class="field-error">First name is required</span>
+                    }
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Last Name <span class="required">*</span></label>
+                    <input type="text" formControlName="lastName" class="form-input"
+                        [class.error]="isFieldInvalid('lastName')" placeholder="Last name"/>
+                    @if (isFieldInvalid('lastName')) {
+                    <span class="field-error">Last name is required</span>
+                    }
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label class="form-label">Email <span class="required">*</span></label>
+                    <input type="email" formControlName="email" class="form-input"
+                        [class.error]="isFieldInvalid('email')" placeholder="email@example.com"/>
+                    @if (isFieldInvalid('email')) {
+                    <span class="field-error">A valid email is required</span>
+                    }
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Phone <span class="required">*</span></label>
+                    <input type="tel" formControlName="phone" class="form-input"
+                        [class.error]="isFieldInvalid('phone')" placeholder="+1 555 000-0000"/>
+                    @if (isFieldInvalid('phone')) {
+                    <span class="field-error">Phone is required</span>
+                    }
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label class="form-label">Password <span class="required">*</span></label>
+                    <input type="text" formControlName="password" class="form-input"
+                        [class.error]="isFieldInvalid('password')" placeholder="Min. 6 characters"/>
+                    @if (isFieldInvalid('password')) {
+                    <span class="field-error">Password is required (min 6 characters)</span>
+                    }
+                </div>
+                <div class="form-group"></div>
+            </div>
+
+            <!-- Patient-specific fields -->
+            @if (selectedRole === 'PATIENT') {
+            <div class="role-specific-section">
+                <h4 class="section-label">Patient Details</h4>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">Date of Birth <span class="required">*</span></label>
+                        <input type="date" formControlName="dob" class="form-input"
+                            [class.error]="isFieldInvalid('dob')"/>
+                        @if (isFieldInvalid('dob')) {
+                        <span class="field-error">Date of birth is required</span>
+                        }
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Address <span class="required">*</span></label>
+                        <input type="text" formControlName="address" class="form-input"
+                            [class.error]="isFieldInvalid('address')" placeholder="Full address"/>
+                        @if (isFieldInvalid('address')) {
+                        <span class="field-error">Address is required</span>
+                        }
+                    </div>
+                </div>
+            </div>
+            }
+
+            <!-- Practitioner-specific fields -->
+            @if (selectedRole === 'PRACTITIONER') {
+            <div class="role-specific-section">
+                <h4 class="section-label">Practitioner Details</h4>
+                <div class="form-group" style="grid-column: 1 / -1;">
+                    <label class="form-label">Specialties <span class="required">*</span></label>
+                    @if (availableSpecialties.length === 0) {
+                        <p class="field-hint">No specialties available. Add specialties in the system first.</p>
+                    } @else {
+                        <div class="specialty-grid">
+                            @for (spec of availableSpecialties; track spec.specialtyId) {
+                                <label class="specialty-checkbox" [class.selected]="selectedSpecialtyIds.includes(spec.specialtyId)">
+                                    <input type="checkbox" [checked]="selectedSpecialtyIds.includes(spec.specialtyId)"
+                                           (change)="toggleSpecialty(spec.specialtyId)" />
+                                    {{ spec.name }}
+                                </label>
+                            }
+                        </div>
+                    }
+                    @if (selectedSpecialtyIds.length > 0) {
+                        <span class="field-hint">{{ selectedSpecialtyIds.length }} specialty(ies) selected</span>
+                    }
+                </div>
+            </div>
+            }
+
+            <div class="form-actions-row">
+                <button type="submit" class="btn-submit" [disabled]="isLoading">
+                    @if (isLoading) {
+                    <span class="spinner"></span> Creating...
+                    } @else {
+                    Create User
+                    }
+                </button>
+            </div>
+        </form>
+    </div>
+    }
+
+    <!-- User List -->
+    <div class="list-card">
+        <div class="list-header">
+            <div class="filters">
+                <input type="text" [(ngModel)]="searchQuery" (input)="applyFilters()"
+                    class="form-input search-input" placeholder="Search by name or username..."/>
+                <select [(ngModel)]="roleFilter" (change)="applyFilters()" class="form-input filter-select">
+                    <option value="ALL">All Roles</option>
+                    <option value="PATIENT">Patient</option>
+                    <option value="PRACTITIONER">Practitioner</option>
+                    <option value="RECEPTIONIST">Receptionist</option>
+                    <option value="SYSTEM_ADMINISTRATOR">Administrator</option>
+                </select>
+            </div>
+            <span class="user-count">{{ filteredUsers.length }} users</span>
+        </div>
+
+        @if (loadingUsers) {
+        <div class="loading-state">
+            <div class="spinner"></div>
+            <span>Loading users...</span>
+        </div>
+        } @else if (filteredUsers.length === 0) {
+        <div class="empty-state">
+            <p>No users found.</p>
+        </div>
+        } @else {
+        <div class="table-responsive">
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Username</th>
+                        <th>Role</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @for (u of filteredUsers; track u.userId) {
+                    <tr [class.disabled-row]="!u.enabled">
+                        <td class="name-cell">{{ u.firstName }} {{ u.lastName }}</td>
+                        <td class="username-cell">{{ u.username }}</td>
+                        <td>
+                            <span class="role-badge" [attr.data-role]="getEffectiveRole(u)">
+                                {{ getRoleLabel(getEffectiveRole(u)) }}
+                            </span>
+                        </td>
+                        <td>
+                            <span class="status-badge" [class.active]="u.enabled" [class.inactive]="!u.enabled">
+                                {{ u.enabled ? 'Active' : 'Disabled' }}
+                            </span>
+                        </td>
+                        <td class="actions-cell">
+                            <button class="btn-icon btn-toggle" (click)="toggleEnabled(u)"
+                                [title]="u.enabled ? 'Disable user' : 'Enable user'">
+                                @if (u.enabled) {
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"/>
+                                    <line x1="1" y1="1" x2="23" y2="23"/>
+                                </svg>
+                                } @else {
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                                    <circle cx="12" cy="12" r="3"/>
+                                </svg>
+                                }
+                            </button>
+                            <button class="btn-icon btn-delete" (click)="deleteUser(u)" title="Delete user">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <polyline points="3 6 5 6 21 6"/>
+                                    <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
+                                </svg>
+                            </button>
+                        </td>
+                    </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+        }
+    </div>
+</div>
