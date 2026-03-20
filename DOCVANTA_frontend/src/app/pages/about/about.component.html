@@ -1,0 +1,180 @@
+<!-- Page Hero -->
+<section class="page-hero">
+  <div class="hero-bg">
+    <div class="hero-gradient"></div>
+    <div class="hero-shapes">
+      <div class="shape shape-1"></div>
+      <div class="shape shape-2"></div>
+    </div>
+  </div>
+
+  <nav class="navbar">
+    <div class="container navbar-content">
+      <a routerLink="/" class="logo">
+        <span class="logo-icon">
+          <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
+            <rect width="32" height="32" rx="8" fill="currentColor"/>
+            <path d="M16 8V24M8 16H24" stroke="white" stroke-width="3" stroke-linecap="round"/>
+          </svg>
+        </span>
+        <span class="logo-text">DocVanta</span>
+      </a>
+      <div class="nav-actions">
+        <a routerLink="/features" class="btn btn-ghost">Features</a>
+        <a routerLink="/about" class="btn btn-ghost active">About</a>
+        <a routerLink="/login" class="btn btn-ghost">Login</a>
+        <a routerLink="/register" class="btn btn-primary">Get Started</a>
+      </div>
+    </div>
+  </nav>
+
+  <div class="container hero-text-center">
+    <h1 class="page-hero-title animate-fadeInUp">About DocVanta</h1>
+    <p class="page-hero-subtitle animate-fadeInUp">A comprehensive clinic management platform built for modern healthcare</p>
+  </div>
+</section>
+
+<!-- Mission Section -->
+<section class="mission">
+  <div class="container">
+    <div class="mission-content animate-fadeInUp">
+      <span class="section-tag">Our Mission</span>
+      <h2 class="section-title">Bridging Healthcare and Technology</h2>
+      <p class="mission-text">DocVanta was designed to bridge the gap between medical professionals and modern technology. We believe that clinic management should be intuitive, secure, and accessible to everyone involved in the healthcare process — from the patient booking their first appointment to the administrator overseeing the entire operation.</p>
+      <p class="mission-text">Our platform eliminates the complexity of managing a medical facility by providing a unified solution that handles scheduling, patient records, billing, and administration in one cohesive system.</p>
+    </div>
+  </div>
+</section>
+
+<!-- Values Section -->
+<section class="values">
+  <div class="container">
+    <div class="section-header animate-fadeInUp">
+      <span class="section-tag">Our Values</span>
+      <h2 class="section-title">What Drives Us</h2>
+      <p class="section-subtitle">The principles that guide every feature we build</p>
+    </div>
+
+    <div class="values-grid">
+      @for (value of values; track value.title; let i = $index) {
+        <div class="value-card animate-fadeInUp" [style.animation-delay]="(i * 100) + 'ms'">
+          <div class="value-icon">
+            @switch (value.icon) {
+              @case ('shield') {
+                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><polyline points="9 12 11 14 15 10"/></svg>
+              }
+              @case ('users') {
+                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+              }
+              @case ('zap') {
+                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+              }
+              @case ('layers') {
+                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/></svg>
+              }
+            }
+          </div>
+          <h3 class="value-title">{{ value.title }}</h3>
+          <p class="value-desc">{{ value.desc }}</p>
+        </div>
+      }
+    </div>
+  </div>
+</section>
+
+<!-- Tech Stack Section -->
+<section class="tech-stack">
+  <div class="container">
+    <div class="section-header animate-fadeInUp">
+      <span class="section-tag">Technology</span>
+      <h2 class="section-title">Built with Modern Technology</h2>
+      <p class="section-subtitle">A robust, secure, and scalable architecture</p>
+    </div>
+
+    <div class="tech-grid">
+      @for (tech of techStack; track tech.name; let i = $index) {
+        <div class="tech-card animate-fadeInUp" [style.animation-delay]="(i * 100) + 'ms'">
+          <div class="tech-icon">
+            @switch (tech.icon) {
+              @case ('server') {
+                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="8" rx="2" ry="2"/><rect x="2" y="14" width="20" height="8" rx="2" ry="2"/><line x1="6" y1="6" x2="6.01" y2="6"/><line x1="6" y1="18" x2="6.01" y2="18"/></svg>
+              }
+              @case ('layout') {
+                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="9" y1="21" x2="9" y2="9"/></svg>
+              }
+              @case ('database') {
+                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/></svg>
+              }
+              @case ('key') {
+                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4"/></svg>
+              }
+            }
+          </div>
+          <h3 class="tech-name">{{ tech.name }}</h3>
+          <p class="tech-role">{{ tech.role }}</p>
+        </div>
+      }
+    </div>
+  </div>
+</section>
+
+<!-- CTA Section -->
+<section class="cta">
+  <div class="container">
+    <div class="cta-content animate-fadeInUp">
+      <h2 class="cta-title">Ready to modernize your clinic?</h2>
+      <p class="cta-subtitle">Join healthcare professionals who trust DocVanta for their daily operations</p>
+      <a routerLink="/register" class="btn btn-primary btn-lg cta-button">
+        Create Your Account
+        <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+          <path d="M4 10H16M16 10L11 5M16 10L11 15" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- Footer -->
+<footer class="footer">
+  <div class="container">
+    <div class="footer-content">
+      <div class="footer-brand">
+        <a routerLink="/" class="logo">
+          <span class="logo-icon">
+            <svg width="28" height="28" viewBox="0 0 32 32" fill="none">
+              <rect width="32" height="32" rx="8" fill="currentColor"/>
+              <path d="M16 8V24M8 16H24" stroke="white" stroke-width="3" stroke-linecap="round"/>
+            </svg>
+          </span>
+          <span class="logo-text">DocVanta</span>
+        </a>
+        <p class="footer-tagline">Smart clinic management for modern healthcare.</p>
+      </div>
+
+      <nav class="footer-nav">
+        <div class="footer-nav-group">
+          <h5 class="footer-nav-title">Product</h5>
+          <a routerLink="/features">Features</a>
+          <a href="#">Pricing</a>
+          <a href="#">Security</a>
+        </div>
+        <div class="footer-nav-group">
+          <h5 class="footer-nav-title">Company</h5>
+          <a routerLink="/about">About</a>
+          <a href="#">Contact</a>
+          <a href="#">Careers</a>
+        </div>
+        <div class="footer-nav-group">
+          <h5 class="footer-nav-title">Legal</h5>
+          <a href="#">Privacy Policy</a>
+          <a href="#">Terms of Service</a>
+          <a href="#">HIPAA</a>
+        </div>
+      </nav>
+    </div>
+
+    <div class="footer-bottom">
+      <p>&copy; 2026 DocVanta. All rights reserved.</p>
+    </div>
+  </div>
+</footer>
