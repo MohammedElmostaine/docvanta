@@ -62,5 +62,3 @@ export class AdminService {
         return this.http.delete<any>(`${this.API_URL}/specialties/${id}`);
     }
 }
-
-

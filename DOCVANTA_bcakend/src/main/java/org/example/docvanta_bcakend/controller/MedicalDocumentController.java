@@ -92,4 +92,3 @@ public class MedicalDocumentController {
         return ResponseEntity.ok(ApiResponse.success("Medical document deleted successfully", null));
     }
 }
-

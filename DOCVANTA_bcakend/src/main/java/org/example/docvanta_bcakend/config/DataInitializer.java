@@ -692,10 +692,3 @@ public class DataInitializer {
         return repo.findByName(name).orElseGet(() -> repo.save(Specialty.builder().name(name).build()));
     }
 }
-
-
-
-
-
-
-

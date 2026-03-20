@@ -74,4 +74,3 @@ public class PatientController {
         return ResponseEntity.ok(ApiResponse.success("Patient deleted successfully", null));
     }
 }
-
