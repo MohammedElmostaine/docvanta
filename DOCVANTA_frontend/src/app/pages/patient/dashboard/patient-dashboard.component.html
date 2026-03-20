@@ -1,0 +1,213 @@
+<div class="patient-dashboard">
+    @if (loading) {
+        <div class="loading-state">
+            <div class="spinner"></div>
+            <p>Loading your dashboard...</p>
+        </div>
+    } @else {
+        <!-- Welcome Banner with Patient Info -->
+        <div class="welcome-banner">
+            <div class="welcome-left">
+                <div class="avatar">
+                    {{ (patient?.firstName?.charAt(0) || 'P') }}{{ (patient?.lastName?.charAt(0) || '') }}
+                </div>
+                <div class="welcome-text">
+                    <h1>Welcome back, {{ patient?.firstName || user?.username || 'Patient' }}</h1>
+                    <p>Here's your health activity overview</p>
+                </div>
+            </div>
+            <div class="welcome-right">
+                <a routerLink="/patient/profile" class="btn-profile">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                    My Profile
+                </a>
+            </div>
+        </div>
+
+        <!-- Stats Cards -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-icon stat-upcoming">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                </div>
+                <div class="stat-info">
+                    <span class="stat-number">{{ stats.upcoming }}</span>
+                    <span class="stat-label">Upcoming</span>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon stat-total">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+                </div>
+                <div class="stat-info">
+                    <span class="stat-number">{{ stats.total }}</span>
+                    <span class="stat-label">Total Appointments</span>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon stat-docs">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+                </div>
+                <div class="stat-info">
+                    <span class="stat-number">{{ stats.documents }}</span>
+                    <span class="stat-label">My Documents</span>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon stat-record">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1" ry="1"/></svg>
+                </div>
+                <div class="stat-info">
+                    <span class="stat-number">{{ stats.hasRecord ? '✓' : '—' }}</span>
+                    <span class="stat-label">Medical Record</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="dashboard-grid">
+            <!-- Upcoming Appointments -->
+            <div class="card">
+                <div class="card-header">
+                    <h3>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                        Upcoming Appointments
+                    </h3>
+                    <a routerLink="/patient/appointments" class="view-all">View All →</a>
+                </div>
+                <div class="card-body">
+                    @if (upcomingAppointments.length === 0) {
+                        <div class="empty-state">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                            <p>No upcoming appointments</p>
+                        </div>
+                    } @else {
+                        <div class="appointment-list">
+                            @for (apt of upcomingAppointments; track apt.appointmentId) {
+                                <div class="appointment-item clickable" (click)="openAppointmentDetail(apt)">
+                                    <div class="apt-date-badge">
+                                        <span class="apt-day">{{ formatDate(apt.datetime).split(' ')[0] }}</span>
+                                        <span class="apt-month">{{ formatDate(apt.datetime).split(' ')[1] }}</span>
+                                    </div>
+                                    <div class="apt-details">
+                                        <span class="apt-doctor">Dr. {{ apt.practitionerName || 'N/A' }}</span>
+                                        <span class="apt-time">{{ formatTime(apt.datetime) }}</span>
+                                    </div>
+                                    <span class="badge" [class]="getStatusClass(apt.status)">{{ apt.status }}</span>
+                                </div>
+                            }
+                        </div>
+                    }
+                </div>
+            </div>
+
+            <!-- Quick Actions -->
+            <div class="card">
+                <div class="card-header">
+                    <h3>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+                        Quick Actions
+                    </h3>
+                </div>
+                <div class="card-body">
+                    <div class="quick-actions">
+                        <a routerLink="/patient/appointments" class="action-card">
+                            <div class="action-icon action-appointments">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                            </div>
+                            <span>My Appointments</span>
+                        </a>
+                        <a routerLink="/patient/documents" class="action-card">
+                            <div class="action-icon action-documents">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+                            </div>
+                            <span>My Documents</span>
+                        </a>
+                        <a routerLink="/patient/record" class="action-card">
+                            <div class="action-icon action-record">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1" ry="1"/></svg>
+                            </div>
+                            <span>Medical Record</span>
+                        </a>
+                        <a routerLink="/patient/profile" class="action-card">
+                            <div class="action-icon action-profile">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                            </div>
+                            <span>My Profile</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Recent Authorized Documents -->
+            <div class="card full-width">
+                <div class="card-header">
+                    <h3>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+                        Recent Documents
+                    </h3>
+                    <a routerLink="/patient/documents" class="view-all">View All →</a>
+                </div>
+                <div class="card-body">
+                    @if (recentDocuments.length === 0) {
+                        <div class="empty-state">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+                            <p>No authorized documents yet</p>
+                        </div>
+                    } @else {
+                        <div class="documents-grid">
+                            @for (doc of recentDocuments; track doc.documentId) {
+                                <div class="doc-card" [class]="getDocTypeClass(doc.type)">
+                                    <div class="doc-card-header">
+                                        <span class="doc-type-badge">{{ doc.type }}</span>
+                                        <span class="doc-date">{{ formatDate(doc.createdDate) }}</span>
+                                    </div>
+                                    <div class="doc-card-body">
+                                        <p class="doc-doctor">Dr. {{ doc.practitionerName || 'N/A' }}</p>
+                                        <p class="doc-preview">{{ doc.content?.substring(0, 80) }}{{ (doc.content?.length || 0) > 80 ? '...' : '' }}</p>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    }
+                </div>
+            </div>
+
+            <!-- Medical Record Summary -->
+            @if (medicalRecord) {
+                <div class="card full-width">
+                    <div class="card-header">
+                        <h3>
+                            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1" ry="1"/></svg>
+                            Medical Record Summary
+                        </h3>
+                        <a routerLink="/patient/record" class="view-all">View Details →</a>
+                    </div>
+                    <div class="card-body">
+                        <div class="record-summary">
+                            <div class="record-item">
+                                <span class="record-label">Blood Type</span>
+                                <span class="record-value blood-type">{{ medicalRecord.bloodType || 'N/A' }}</span>
+                            </div>
+                            <div class="record-item">
+                                <span class="record-label">Allergies</span>
+                                <span class="record-value">{{ medicalRecord.allergies || 'None recorded' }}</span>
+                            </div>
+                            <div class="record-item">
+                                <span class="record-label">Chronic Diseases</span>
+                                <span class="record-value">{{ medicalRecord.chronicDiseases || 'None recorded' }}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+
+    <app-appointment-detail-modal
+        [appointment]="selectedAppointment"
+        [role]="'PATIENT'"
+        [processing]="processingAction"
+        (close)="closeAppointmentDetail()"
+        (action)="onAppointmentAction($event)"
+    />
+</div>
