@@ -1,0 +1,220 @@
+<div class="dashboard-container">
+    @if (loading) {
+        <div class="loading-state">
+            <div class="spinner"></div>
+            <span>Loading dashboard...</span>
+        </div>
+    } @else {
+        <!-- Welcome Banner -->
+        <div class="welcome-banner">
+            <div class="welcome-content">
+                <div class="welcome-avatar">
+                    {{ staffInfo?.firstName?.charAt(0) || 'S' }}{{ staffInfo?.lastName?.charAt(0) || '' }}
+                </div>
+                <div class="welcome-text">
+                    <h2>{{ getGreeting() }}, {{ staffInfo?.firstName || user?.username }}</h2>
+                    <p>
+                        @if (staffInfo?.departmentNames?.length) {
+                            {{ staffInfo.departmentNames.join(', ') }} &mdash;
+                        }
+                        {{ formatCurrentDate() }}
+                    </p>
+                </div>
+            </div>
+            <div class="welcome-time">
+                <span class="current-time">{{ formatCurrentTime() }}</span>
+            </div>
+        </div>
+
+        <!-- Stats Cards -->
+        <div class="stats-grid">
+            <div class="stat-card stat-today">
+                <div class="stat-icon">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                </div>
+                <div class="stat-info">
+                    <span class="stat-value">{{ stats.totalToday }}</span>
+                    <span class="stat-label">Today's Appointments</span>
+                </div>
+            </div>
+            <div class="stat-card stat-checkin">
+                <div class="stat-icon">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                </div>
+                <div class="stat-info">
+                    <span class="stat-value">{{ stats.awaitingCheckIn }}</span>
+                    <span class="stat-label">Awaiting Check-In</span>
+                </div>
+            </div>
+            <div class="stat-card stat-confirmed">
+                <div class="stat-icon">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+                </div>
+                <div class="stat-info">
+                    <span class="stat-value">{{ stats.confirmed }}</span>
+                    <span class="stat-label">Checked In</span>
+                </div>
+            </div>
+            <div class="stat-card stat-patients">
+                <div class="stat-icon">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                </div>
+                <div class="stat-info">
+                    <span class="stat-value">{{ stats.totalPatients }}</span>
+                    <span class="stat-label">Total Patients</span>
+                </div>
+            </div>
+            <div class="stat-card stat-practitioners">
+                <div class="stat-icon">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/><line x1="12" y1="11" x2="12" y2="17"/><line x1="9" y1="14" x2="15" y2="14"/></svg>
+                </div>
+                <div class="stat-info">
+                    <span class="stat-value">{{ stats.totalPractitioners }}</span>
+                    <span class="stat-label">Practitioners</span>
+                </div>
+            </div>
+            <div class="stat-card stat-completed">
+                <div class="stat-icon">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+                </div>
+                <div class="stat-info">
+                    <span class="stat-value">{{ stats.completed }}</span>
+                    <span class="stat-label">Completed Today</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="dashboard-grid">
+            <!-- Patients Awaiting Check-In -->
+            @if (patientsAwaitingCheckIn.length > 0) {
+                <div class="dashboard-card checkin-card">
+                    <div class="card-header card-header-urgent">
+                        <h3>
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                            Patients Awaiting Check-In
+                        </h3>
+                        <span class="urgent-badge">{{ patientsAwaitingCheckIn.length }} waiting</span>
+                    </div>
+                    <div class="card-body">
+                        <div class="checkin-list">
+                            @for (apt of patientsAwaitingCheckIn; track apt.appointmentId) {
+                                <div class="checkin-row clickable" (click)="openAppointmentDetail(apt)">
+                                    <div class="checkin-patient">
+                                        <div class="patient-avatar-small">
+                                            {{ apt.patientName?.charAt(0) || 'P' }}
+                                        </div>
+                                        <div class="checkin-info">
+                                            <span class="patient-name">{{ apt.patientName }}</span>
+                                            <span class="apt-time-small">{{ formatTime(apt.datetime) }} - Dr. {{ apt.practitionerName }}</span>
+                                        </div>
+                                    </div>
+                                    <button class="btn-checkin-small" (click)="confirmAppointment(apt.appointmentId); $event.stopPropagation()" [disabled]="isProcessing(apt.appointmentId)" title="Check In">
+                                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+                                        {{ isProcessing(apt.appointmentId) ? 'Processing...' : 'Check In' }}
+                                    </button>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                </div>
+            }
+
+            <!-- Upcoming Appointments -->
+            <div class="dashboard-card appointments-card">
+                <div class="card-header">
+                    <h3>
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                        Upcoming Appointments
+                    </h3>
+                    <a [routerLink]="basePath + '/appointments'" class="view-all-link">View All &rarr;</a>
+                </div>
+                <div class="card-body">
+                    @if (upcomingAppointments.length === 0) {
+                        <div class="empty-state-small">
+                            <p>No upcoming appointments</p>
+                        </div>
+                    } @else {
+                        <div class="appointments-list">
+                            @for (apt of upcomingAppointments; track apt.appointmentId) {
+                                <div class="appointment-row clickable" (click)="openAppointmentDetail(apt)">
+                                    <div class="apt-date">
+                                        <span class="apt-day">{{ formatDate(apt.datetime) }}</span>
+                                        <span class="apt-time">{{ formatTime(apt.datetime) }}</span>
+                                    </div>
+                                    <div class="apt-info">
+                                        <span class="apt-patient">{{ apt.patientName }}</span>
+                                        <span class="apt-doctor">Dr. {{ apt.practitionerName }}</span>
+                                    </div>
+                                    <span class="status-badge" [ngClass]="getStatusClass(apt.status)">{{ apt.status }}</span>
+                                    <div class="apt-actions">
+                                        @if (apt.status === 'PENDING') {
+                                            <button class="btn-confirm" (click)="confirmAppointment(apt.appointmentId); $event.stopPropagation()" [disabled]="isProcessing(apt.appointmentId)" title="Confirm">
+                                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+                                            </button>
+                                        }
+                                        @if (apt.status === 'CONFIRMED') {
+                                            <button class="btn-complete" (click)="completeAppointment(apt.appointmentId); $event.stopPropagation()" [disabled]="isProcessing(apt.appointmentId)" title="Mark Complete">
+                                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+                                            </button>
+                                        }
+                                        @if (apt.status !== 'CANCELLED' && apt.status !== 'COMPLETED') {
+                                            <button class="btn-cancel" (click)="cancelAppointment(apt.appointmentId); $event.stopPropagation()" [disabled]="isProcessing(apt.appointmentId)" title="Cancel">
+                                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                                            </button>
+                                        }
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    }
+                </div>
+            </div>
+
+            <!-- Quick Actions -->
+            <div class="dashboard-card quick-actions-card">
+                <div class="card-header">
+                    <h3>
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+                        Quick Actions
+                    </h3>
+                </div>
+                <div class="card-body">
+                    <div class="quick-actions-grid">
+                        <a [routerLink]="basePath + '/appointments'" class="quick-action-btn">
+                            <div class="action-icon action-appointments">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/><line x1="12" y1="14" x2="12" y2="18"/><line x1="10" y1="16" x2="14" y2="16"/></svg>
+                            </div>
+                            <span>New Appointment</span>
+                        </a>
+                        <a [routerLink]="basePath + '/patients'" class="quick-action-btn">
+                            <div class="action-icon action-patients">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
+                            </div>
+                            <span>View Patients</span>
+                        </a>
+                        <a [routerLink]="basePath + '/doctors'" class="quick-action-btn">
+                            <div class="action-icon action-practitioners">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/><line x1="12" y1="11" x2="12" y2="17"/><line x1="9" y1="14" x2="15" y2="14"/></svg>
+                            </div>
+                            <span>Practitioner Schedules</span>
+                        </a>
+                        <a [routerLink]="basePath + '/appointments'" class="quick-action-btn">
+                            <div class="action-icon action-schedule">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                            </div>
+                            <span>All Appointments</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+
+    <app-appointment-detail-modal
+        [appointment]="selectedAppointment"
+        [role]="userRole"
+        [processing]="processingAction"
+        (close)="closeAppointmentDetail()"
+        (action)="onAppointmentAction($event)"
+    />
+</div>

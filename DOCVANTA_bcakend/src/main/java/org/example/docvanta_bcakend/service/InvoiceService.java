@@ -17,7 +17,7 @@ import java.util.stream.Collectors;
 
 @Service
 @Transactional
-public class InvoiceService {
+public class InvoiceService implements org.example.docvanta_bcakend.service.interfaces.InvoiceServiceInterface {
 
     private final InvoiceRepository invoiceRepository;
     private final InvoiceLineRepository invoiceLineRepository;

@@ -1,0 +1,10 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(curl -s -X POST http://localhost:8081/api/auth/login -H \"Content-Type: application/json\" -d '{\"\"username\"\":\"\"doctor1\"\",\"\"password\"\":\"\"doctor123\"\"}')",
+      "Bash(curl -s -X POST http://localhost:8081/api/auth/login -H \"Content-Type: application/json\" -d '{\"\"username\"\":\"\"patient1\"\",\"\"password\"\":\"\"patient123\"\"}')",
+      "Bash(ls -1 /c/Users/elmos/Desktop/Ycode/jv/Projet-Fil-Rouge/DOCVANTA_frontend/src/app/services/*.service.ts)",
+      "Bash(xargs -I {} basename {})"
+    ]
+  }
+}

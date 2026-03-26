@@ -29,7 +29,7 @@ import java.util.List;
 import java.util.Map;
 
 @Service
-public class AuthService {
+public class AuthService implements org.example.docvanta_bcakend.service.interfaces.AuthServiceInterface {
 
     private final UserRepository userRepository;
     private final UserRoleRepository userRoleRepository;

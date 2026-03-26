@@ -12,7 +12,7 @@ import java.util.stream.Collectors;
 
 @Service
 @Transactional
-public class PractitionerService {
+public class PractitionerService implements org.example.docvanta_bcakend.service.interfaces.PractitionerServiceInterface {
 
     private final PractitionerRepository practitionerRepository;
 

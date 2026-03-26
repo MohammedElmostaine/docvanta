@@ -1,0 +1,287 @@
+<div class="management-page">
+    <div class="page-header">
+        <div>
+            <h2>Patient Directory</h2>
+            <p class="subtitle">View patient information and manage check-ins</p>
+        </div>
+        <button class="btn-primary" (click)="openRegisterModal()">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+            </svg>
+            Register Patient
+        </button>
+    </div>
+
+    <!-- Alerts -->
+    @if (successMessage) {
+        <div class="success-banner">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/>
+            </svg>
+            {{ successMessage }}
+        </div>
+    }
+    @if (errorMessage) {
+        <div class="error-banner">{{ errorMessage }}</div>
+    }
+
+    <!-- Today's Check-ins Summary -->
+    @if (todayAppointments.length > 0) {
+        <div class="checkin-summary">
+            <div class="checkin-header">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/>
+                    <line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/>
+                </svg>
+                <span>Today's Appointments: <strong>{{ todayAppointments.length }}</strong></span>
+            </div>
+            <div class="checkin-stats">
+                <span class="stat-item stat-pending">
+                    {{ pendingCount }} Pending
+                </span>
+                <span class="stat-item stat-confirmed">
+                    {{ checkedInCount }} Checked In
+                </span>
+            </div>
+        </div>
+    }
+
+    <!-- Toolbar -->
+    <div class="toolbar">
+        <div class="search-box">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+            </svg>
+            <input type="text" [(ngModel)]="searchQuery" (input)="onSearch()"
+                   placeholder="Search by name, email, phone..." class="search-input" />
+        </div>
+        <span class="count-badge">{{ filteredPatients.length }} patient{{ filteredPatients.length !== 1 ? 's' : '' }}</span>
+    </div>
+
+    @if (loading) {
+        <div class="loading-state"><div class="spinner"></div><span>Loading patients...</span></div>
+    } @else if (filteredPatients.length === 0) {
+        <div class="empty-state">
+            <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/>
+            </svg>
+            <h3>No patients found</h3>
+            <p>Try adjusting your search or register a new patient.</p>
+        </div>
+    } @else {
+        <div class="cards-grid">
+            @for (patient of filteredPatients; track patient.userId) {
+                <div class="entity-card" [class.has-appointment]="hasAppointmentToday(patient.userId)">
+                    @if (hasAppointmentToday(patient.userId)) {
+                        <div class="appointment-indicator">
+                            <span class="indicator-badge" [class.waiting]="getPatientTodayAppointment(patient.userId)?.status === 'PENDING'"
+                                  [class.checked-in]="getPatientTodayAppointment(patient.userId)?.status === 'CONFIRMED'">
+                                @if (getPatientTodayAppointment(patient.userId)?.status === 'PENDING') {
+                                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                                        <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
+                                    </svg>
+                                    Waiting - {{ formatTime(getPatientTodayAppointment(patient.userId)?.datetime || '') }}
+                                } @else {
+                                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                                        <polyline points="20 6 9 17 4 12"/>
+                                    </svg>
+                                    Checked In
+                                }
+                            </span>
+                        </div>
+                    }
+                    <div class="card-header">
+                        <div class="avatar patient-avatar">
+                            {{ (patient.firstName?.charAt(0) || '') + (patient.lastName?.charAt(0) || '') }}
+                        </div>
+                        <div class="card-title">
+                            <h4>{{ patient.firstName }} {{ patient.lastName }}</h4>
+                            <span class="card-subtitle">{{ patient.email || 'No email' }}</span>
+                        </div>
+                        <div class="card-actions">
+                            <button class="icon-btn view-btn" (click)="viewPatientDetails(patient)" title="View Details">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                                    <circle cx="12" cy="12" r="3"/>
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="detail-row">
+                            <span class="detail-label">Phone</span>
+                            <span class="detail-value">{{ patient.phone || 'N/A' }}</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-label">Date of Birth</span>
+                            <span class="detail-value">{{ formatDate(patient.dob) }} ({{ calculateAge(patient.dob) }} yrs)</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-label">Status</span>
+                            <span class="status-badge" [class.status-active]="patient.enabled">
+                                {{ patient.enabled ? 'Active' : 'Inactive' }}
+                            </span>
+                        </div>
+                    </div>
+                    @if (hasAppointmentToday(patient.userId) && getPatientTodayAppointment(patient.userId)?.status === 'PENDING') {
+                        <div class="card-footer">
+                            <button class="btn-checkin" (click)="checkInPatient(patient.userId)">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                                    <polyline points="20 6 9 17 4 12"/>
+                                </svg>
+                                Check In Patient
+                            </button>
+                        </div>
+                    }
+                </div>
+            }
+        </div>
+    }
+
+    <!-- Patient Detail Modal -->
+    @if (showDetailModal && selectedPatient) {
+        <div class="modal-overlay" (click)="closeDetailModal()">
+            <div class="modal-content modal-lg" (click)="$event.stopPropagation()">
+                <div class="modal-header">
+                    <div class="modal-title-group">
+                        <div class="avatar patient-avatar modal-avatar">
+                            {{ (selectedPatient.firstName?.charAt(0) || '') + (selectedPatient.lastName?.charAt(0) || '') }}
+                        </div>
+                        <div>
+                            <h3>{{ selectedPatient.firstName }} {{ selectedPatient.lastName }}</h3>
+                            <span class="modal-subtitle">Patient Profile</span>
+                        </div>
+                    </div>
+                    <button class="modal-close" (click)="closeDetailModal()">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+                        </svg>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="info-grid">
+                        <div class="info-card">
+                            <span class="info-label">Email</span>
+                            <span class="info-value">{{ selectedPatient.email || 'N/A' }}</span>
+                        </div>
+                        <div class="info-card">
+                            <span class="info-label">Phone</span>
+                            <span class="info-value">{{ selectedPatient.phone || 'N/A' }}</span>
+                        </div>
+                        <div class="info-card">
+                            <span class="info-label">Date of Birth</span>
+                            <span class="info-value">{{ formatDate(selectedPatient.dob) }}</span>
+                        </div>
+                        <div class="info-card">
+                            <span class="info-label">Age</span>
+                            <span class="info-value">{{ calculateAge(selectedPatient.dob) }} years</span>
+                        </div>
+                        <div class="info-card full-width">
+                            <span class="info-label">Address</span>
+                            <span class="info-value">{{ selectedPatient.address || 'Not provided' }}</span>
+                        </div>
+                    </div>
+
+                    <div class="section-divider">
+                        <h4>
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/>
+                                <line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/>
+                            </svg>
+                            Recent Appointments
+                        </h4>
+                    </div>
+
+                    @if (loadingPatientDetails) {
+                        <div class="mini-loading"><div class="spinner-sm"></div> Loading appointments...</div>
+                    } @else if (patientAppointments.length === 0) {
+                        <p class="no-data">No appointment history found.</p>
+                    } @else {
+                        <div class="appointments-list-modal">
+                            @for (apt of patientAppointments; track apt.appointmentId) {
+                                <div class="apt-item">
+                                    <div class="apt-date-col">
+                                        <span class="apt-date">{{ formatDate(apt.datetime) }}</span>
+                                        <span class="apt-time">{{ formatTime(apt.datetime) }}</span>
+                                    </div>
+                                    <div class="apt-info-col">
+                                        <span class="apt-doctor">Dr. {{ apt.practitionerName }}</span>
+                                    </div>
+                                    <span class="status-badge" [ngClass]="getStatusClass(apt.status)">{{ apt.status }}</span>
+                                </div>
+                            }
+                        </div>
+                    }
+                </div>
+                <div class="modal-footer">
+                    <button class="btn-secondary" (click)="closeDetailModal()">Close</button>
+                </div>
+            </div>
+        </div>
+    }
+
+    <!-- Register Patient Modal -->
+    @if (showRegisterModal) {
+        <div class="modal-overlay" (click)="closeRegisterModal()">
+            <div class="modal-content" (click)="$event.stopPropagation()">
+                <div class="modal-header">
+                    <h3>Register New Patient</h3>
+                    <button class="modal-close" (click)="closeRegisterModal()">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+                        </svg>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    @if (registerError) { <div class="error-banner">{{ registerError }}</div> }
+
+                    <p class="info-text">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/>
+                            <line x1="12" y1="8" x2="12.01" y2="8"/>
+                        </svg>
+                        For full registration with login credentials, please direct patients to the registration page.
+                    </p>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>First Name *</label>
+                            <input type="text" [(ngModel)]="newPatient.firstName" class="form-input" placeholder="Enter first name" />
+                        </div>
+                        <div class="form-group">
+                            <label>Last Name *</label>
+                            <input type="text" [(ngModel)]="newPatient.lastName" class="form-input" placeholder="Enter last name" />
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Email</label>
+                        <input type="email" [(ngModel)]="newPatient.email" class="form-input" placeholder="patient@email.com" />
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Phone</label>
+                            <input type="tel" [(ngModel)]="newPatient.phone" class="form-input" placeholder="+212 6XX XXX XXX" />
+                        </div>
+                        <div class="form-group">
+                            <label>Date of Birth</label>
+                            <input type="date" [(ngModel)]="newPatient.dob" class="form-input" />
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Address</label>
+                        <input type="text" [(ngModel)]="newPatient.address" class="form-input" placeholder="Enter address" />
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn-secondary" (click)="closeRegisterModal()">Cancel</button>
+                    <button class="btn-primary" (click)="registerPatient()" [disabled]="registering || !newPatient.firstName || !newPatient.lastName">
+                        {{ registering ? 'Registering...' : 'Register Patient' }}
+                    </button>
+                </div>
+            </div>
+        </div>
+    }
+</div>

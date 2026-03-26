@@ -21,7 +21,7 @@ import java.util.*;
  */
 @Service
 @Transactional(readOnly = true)
-public class SchedulingService {
+public class SchedulingService implements org.example.docvanta_bcakend.service.interfaces.SchedulingServiceInterface {
 
     /** Default clinic hours (used when practitioner has no schedule for the day) */
     static final LocalTime DEFAULT_START = LocalTime.of(8, 0);

@@ -39,7 +39,7 @@ public class ClinicalDepartment {
     @JoinColumn(name = "clinic_id")
     private Clinic clinic;
 
-    @OneToMany(mappedBy = "department", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "department", cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     @Builder.Default
     private List<Practitioner> practitioners = new ArrayList<>();
 }

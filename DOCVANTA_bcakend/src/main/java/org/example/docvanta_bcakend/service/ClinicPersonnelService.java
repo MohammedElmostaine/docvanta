@@ -12,7 +12,7 @@ import java.util.stream.Collectors;
 
 @Service
 @Transactional
-public class ClinicPersonnelService {
+public class ClinicPersonnelService implements org.example.docvanta_bcakend.service.interfaces.ClinicPersonnelServiceInterface {
 
     private final ClinicPersonnelRepository clinicPersonnelRepository;
 

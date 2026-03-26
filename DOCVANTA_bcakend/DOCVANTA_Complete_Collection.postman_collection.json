@@ -1,0 +1,1602 @@
+{
+	"info": {
+		"_postman_id": "docvanta-complete-collection-2024",
+		"name": "DOCVANTA Backend - Complete API Collection",
+		"description": "Complete API collection for DOCVANTA Medical Clinic Management System\n\n**Base URL:** http://localhost:8081\n\n**Authentication:** JWT Bearer Token (obtained from login)\n\n**Usage Instructions:**\n1. First, run the 'Register' request to create a user\n2. Then run 'Login' to get the JWT token\n3. The token will be automatically saved to the collection variable\n4. All subsequent requests will use this token automatically",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"auth": {
+		"type": "bearer",
+		"bearer": [
+			{
+				"key": "token",
+				"value": "{{jwt_token}}",
+				"type": "string"
+			}
+		]
+	},
+	"variable": [
+		{
+			"key": "base_url",
+			"value": "http://localhost:8081",
+			"type": "string"
+		},
+		{
+			"key": "jwt_token",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "user_id",
+			"value": "",
+			"type": "string"
+		}
+	],
+	"item": [
+		{
+			"name": "Authentication",
+			"item": [
+				{
+					"name": "Register Patient",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200) {",
+									"    var jsonData = pm.response.json();",
+									"    if (jsonData.token) {",
+									"        pm.collectionVariables.set(\"jwt_token\", jsonData.token);",
+									"        console.log(\"Token saved:\", jsonData.token);",
+									"    }",
+									"    if (jsonData.userId) {",
+									"        pm.collectionVariables.set(\"user_id\", jsonData.userId);",
+									"    }",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"username\": \"patient1\",\n  \"password\": \"password123\",\n  \"firstName\": \"John\",\n  \"lastName\": \"Doe\",\n  \"email\": \"john.doe@example.com\",\n  \"phone\": \"+1234567890\",\n  \"userType\": \"PATIENT\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/auth/register",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"auth",
+								"register"
+							]
+						},
+						"description": "Register a new user (PATIENT, DOCTOR, or STAFF)"
+					},
+					"response": []
+				},
+				{
+					"name": "Register Doctor",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200) {",
+									"    var jsonData = pm.response.json();",
+									"    if (jsonData.token) {",
+									"        pm.collectionVariables.set(\"jwt_token\", jsonData.token);",
+									"    }",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"username\": \"doctor1\",\n  \"password\": \"password123\",\n  \"firstName\": \"Jane\",\n  \"lastName\": \"Smith\",\n  \"email\": \"jane.smith@docvanta.com\",\n  \"phone\": \"+1234567891\",\n  \"userType\": \"DOCTOR\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/auth/register",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"auth",
+								"register"
+							]
+						},
+						"description": "Register a new doctor user"
+					},
+					"response": []
+				},
+				{
+					"name": "Login",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200) {",
+									"    var jsonData = pm.response.json();",
+									"    if (jsonData.token) {",
+									"        pm.collectionVariables.set(\"jwt_token\", jsonData.token);",
+									"        console.log(\"Token saved:\", jsonData.token);",
+									"    }",
+									"    if (jsonData.userId) {",
+									"        pm.collectionVariables.set(\"user_id\", jsonData.userId);",
+									"    }",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"username\": \"patient1\",\n  \"password\": \"password123\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/auth/login",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"auth",
+								"login"
+							]
+						},
+						"description": "Login with username and password to get JWT token"
+					},
+					"response": []
+				}
+			],
+			"description": "Authentication endpoints for user registration and login"
+		},
+		{
+			"name": "Patients",
+			"item": [
+				{
+					"name": "Get All Patients",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/patients",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"patients"
+							]
+						},
+						"description": "Retrieve all patients"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Patient By ID",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/patients/1",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"patients",
+								"1"
+							]
+						},
+						"description": "Get patient details by ID"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Patient By Username",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/patients/username/patient1",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"patients",
+								"username",
+								"patient1"
+							]
+						},
+						"description": "Get patient details by username"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Patients By Clinic",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/patients/clinic/1",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"patients",
+								"clinic",
+								"1"
+							]
+						},
+						"description": "Get all patients for a specific clinic"
+					},
+					"response": []
+				},
+				{
+					"name": "Search Patients",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/patients/search?q=John",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"patients",
+								"search"
+							],
+							"query": [
+								{
+									"key": "q",
+									"value": "John"
+								}
+							]
+						},
+						"description": "Search patients by name, email, or phone"
+					},
+					"response": []
+				},
+				{
+					"name": "Update Patient",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"firstName\": \"John\",\n  \"lastName\": \"Doe\",\n  \"email\": \"john.doe.updated@example.com\",\n  \"phone\": \"+1234567890\",\n  \"address\": \"123 Main St, City, Country\",\n  \"dateOfBirth\": \"1990-01-15\",\n  \"bloodType\": \"O+\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/patients/1",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"patients",
+								"1"
+							]
+						},
+						"description": "Update patient information"
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Patient",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/patients/1",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"patients",
+								"1"
+							]
+						},
+						"description": "Delete a patient"
+					},
+					"response": []
+				}
+			],
+			"description": "Patient management endpoints"
+		},
+		{
+			"name": "Doctors",
+			"item": [
+				{
+					"name": "Get All Doctors",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/doctors",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"doctors"
+							]
+						},
+						"description": "Retrieve all doctors"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Doctor By ID",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/doctors/1",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"doctors",
+								"1"
+							]
+						},
+						"description": "Get doctor details by ID"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Doctor By Username",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/doctors/username/doctor1",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"doctors",
+								"username",
+								"doctor1"
+							]
+						},
+						"description": "Get doctor details by username"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Doctors By Clinic",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/doctors/clinic/1",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"doctors",
+								"clinic",
+								"1"
+							]
+						},
+						"description": "Get all doctors in a specific clinic"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Doctors By Department",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/doctors/department/1",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"doctors",
+								"department",
+								"1"
+							]
+						},
+						"description": "Get all doctors in a specific department"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Doctors By Specialty",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/doctors/specialty/Cardiology",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"doctors",
+								"specialty",
+								"Cardiology"
+							]
+						},
+						"description": "Get doctors by specialty name"
+					},
+					"response": []
+				},
+				{
+					"name": "Search Doctors",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/doctors/search?q=Smith",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"doctors",
+								"search"
+							],
+							"query": [
+								{
+									"key": "q",
+									"value": "Smith"
+								}
+							]
+						},
+						"description": "Search doctors by name or email"
+					},
+					"response": []
+				},
+				{
+					"name": "Update Doctor",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"firstName\": \"Jane\",\n  \"lastName\": \"Smith\",\n  \"email\": \"jane.smith.updated@docvanta.com\",\n  \"phone\": \"+1234567891\",\n  \"licenseNumber\": \"DOC123456\",\n  \"yearsOfExperience\": 10,\n  \"consultationFee\": 150.00\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/doctors/1",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"doctors",
+								"1"
+							]
+						},
+						"description": "Update doctor information"
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Doctor",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/doctors/1",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"doctors",
+								"1"
+							]
+						},
+						"description": "Delete a doctor"
+					},
+					"response": []
+				}
+			],
+			"description": "Doctor management endpoints"
+		},
+		{
+			"name": "Appointments",
+			"item": [
+				{
+					"name": "Get All Appointments",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/appointments",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"appointments"
+							]
+						},
+						"description": "Retrieve all appointments"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Appointment By ID",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/appointments/1",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"appointments",
+								"1"
+							]
+						},
+						"description": "Get appointment details by ID"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Appointments By Doctor",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/appointments/doctor/1",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"appointments",
+								"doctor",
+								"1"
+							]
+						},
+						"description": "Get all appointments for a specific doctor"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Appointments By Patient",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/appointments/patient/1",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"appointments",
+								"patient",
+								"1"
+							]
+						},
+						"description": "Get all appointments for a specific patient"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Appointments By Status",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/appointments/status/SCHEDULED",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"appointments",
+								"status",
+								"SCHEDULED"
+							]
+						},
+						"description": "Get appointments by status (SCHEDULED, COMPLETED, CANCELLED)"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Appointments By Date Range",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/appointments/date-range?start=2026-03-06T00:00:00&end=2026-03-10T23:59:59",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"appointments",
+								"date-range"
+							],
+							"query": [
+								{
+									"key": "start",
+									"value": "2026-03-06T00:00:00"
+								},
+								{
+									"key": "end",
+									"value": "2026-03-10T23:59:59"
+								}
+							]
+						},
+						"description": "Get appointments within a date range"
+					},
+					"response": []
+				},
+				{
+					"name": "Create Appointment",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"datetime\": \"2026-03-10T14:30:00\",\n  \"doctorId\": 1,\n  \"patientId\": 1,\n  \"status\": \"SCHEDULED\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/appointments",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"appointments"
+							]
+						},
+						"description": "Create a new appointment"
+					},
+					"response": []
+				},
+				{
+					"name": "Update Appointment",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"datetime\": \"2026-03-10T15:00:00\",\n  \"doctorId\": 1,\n  \"patientId\": 1,\n  \"status\": \"SCHEDULED\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/appointments/1",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"appointments",
+								"1"
+							]
+						},
+						"description": "Update an existing appointment"
+					},
+					"response": []
+				},
+				{
+					"name": "Update Appointment Status",
+					"request": {
+						"method": "PATCH",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/appointments/1/status?status=COMPLETED",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"appointments",
+								"1",
+								"status"
+							],
+							"query": [
+								{
+									"key": "status",
+									"value": "COMPLETED"
+								}
+							]
+						},
+						"description": "Update appointment status only"
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Appointment",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/appointments/1",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"appointments",
+								"1"
+							]
+						},
+						"description": "Delete an appointment"
+					},
+					"response": []
+				}
+			],
+			"description": "Appointment management endpoints"
+		},
+		{
+			"name": "Clinics",
+			"item": [
+				{
+					"name": "Get All Clinics",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/clinics",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"clinics"
+							]
+						},
+						"description": "Retrieve all clinics"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Clinic By ID",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/clinics/1",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"clinics",
+								"1"
+							]
+						},
+						"description": "Get clinic details by ID"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Clinic By Name",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/clinics/name/DOCVANTA Main Clinic",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"clinics",
+								"name",
+								"DOCVANTA Main Clinic"
+							]
+						},
+						"description": "Get clinic by name"
+					},
+					"response": []
+				},
+				{
+					"name": "Create Clinic",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"DOCVANTA Main Clinic\",\n  \"address\": \"123 Healthcare Ave, Medical City\",\n  \"phone\": \"+1234567899\",\n  \"email\": \"contact@docvanta.com\",\n  \"website\": \"https://www.docvanta.com\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/clinics",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"clinics"
+							]
+						},
+						"description": "Create a new clinic"
+					},
+					"response": []
+				},
+				{
+					"name": "Update Clinic",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"DOCVANTA Main Clinic - Updated\",\n  \"address\": \"123 Healthcare Ave, Medical City\",\n  \"phone\": \"+1234567899\",\n  \"email\": \"contact@docvanta.com\",\n  \"website\": \"https://www.docvanta.com\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/clinics/1",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"clinics",
+								"1"
+							]
+						},
+						"description": "Update clinic information"
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Clinic",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/clinics/1",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"clinics",
+								"1"
+							]
+						},
+						"description": "Delete a clinic"
+					},
+					"response": []
+				}
+			],
+			"description": "Clinic management endpoints"
+		},
+		{
+			"name": "Departments",
+			"item": [
+				{
+					"name": "Get All Departments",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/departments",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"departments"
+							]
+						},
+						"description": "Retrieve all departments"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Department By ID",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/departments/1",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"departments",
+								"1"
+							]
+						},
+						"description": "Get department details by ID"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Departments By Clinic",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/departments/clinic/1",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"departments",
+								"clinic",
+								"1"
+							]
+						},
+						"description": "Get all departments in a specific clinic"
+					},
+					"response": []
+				},
+				{
+					"name": "Create Department",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"Cardiology\",\n  \"description\": \"Heart and cardiovascular system care\",\n  \"floor\": 2,\n  \"phone\": \"+1234567800\",\n  \"clinicId\": 1\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/departments",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"departments"
+							]
+						},
+						"description": "Create a new department"
+					},
+					"response": []
+				},
+				{
+					"name": "Update Department",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"Cardiology - Updated\",\n  \"description\": \"Heart and cardiovascular system specialized care\",\n  \"floor\": 2,\n  \"phone\": \"+1234567800\",\n  \"clinicId\": 1\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/departments/1",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"departments",
+								"1"
+							]
+						},
+						"description": "Update department information"
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Department",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/departments/1",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"departments",
+								"1"
+							]
+						},
+						"description": "Delete a department"
+					},
+					"response": []
+				}
+			],
+			"description": "Department management endpoints"
+		},
+		{
+			"name": "Staff",
+			"item": [
+				{
+					"name": "Get All Staff",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/staff",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"staff"
+							]
+						},
+						"description": "Retrieve all staff members"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Staff By ID",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/staff/1",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"staff",
+								"1"
+							]
+						},
+						"description": "Get staff details by ID"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Staff By Clinic",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/staff/clinic/1",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"staff",
+								"clinic",
+								"1"
+							]
+						},
+						"description": "Get all staff in a specific clinic"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Staff By Position",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/staff/position/Nurse",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"staff",
+								"position",
+								"Nurse"
+							]
+						},
+						"description": "Get staff by position/role"
+					},
+					"response": []
+				},
+				{
+					"name": "Update Staff",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"firstName\": \"Emily\",\n  \"lastName\": \"Johnson\",\n  \"email\": \"emily.johnson@docvanta.com\",\n  \"phone\": \"+1234567802\",\n  \"position\": \"Senior Nurse\",\n  \"hireDate\": \"2020-01-15\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/staff/1",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"staff",
+								"1"
+							]
+						},
+						"description": "Update staff information"
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Staff",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/staff/1",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"staff",
+								"1"
+							]
+						},
+						"description": "Delete a staff member"
+					},
+					"response": []
+				}
+			],
+			"description": "Staff management endpoints"
+		},
+		{
+			"name": "Documents",
+			"item": [
+				{
+					"name": "Get All Documents",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/documents",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"documents"
+							]
+						},
+						"description": "Retrieve all documents"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Document By ID",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/documents/1",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"documents",
+								"1"
+							]
+						},
+						"description": "Get document details by ID"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Documents By Patient",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/documents/patient/1",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"documents",
+								"patient",
+								"1"
+							]
+						},
+						"description": "Get all documents for a specific patient"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Documents By Doctor",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/documents/doctor/1",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"documents",
+								"doctor",
+								"1"
+							]
+						},
+						"description": "Get all documents created by a specific doctor"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Authorized Documents For Patient",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/documents/patient/1/authorized",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"documents",
+								"patient",
+								"1",
+								"authorized"
+							]
+						},
+						"description": "Get documents authorized for patient viewing"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Documents By Type",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/documents/type/PRESCRIPTION",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"documents",
+								"type",
+								"PRESCRIPTION"
+							]
+						},
+						"description": "Get documents by type (PRESCRIPTION, LAB_REPORT, etc.)"
+					},
+					"response": []
+				},
+				{
+					"name": "Create Document",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"title\": \"Medical Prescription\",\n  \"type\": \"PRESCRIPTION\",\n  \"content\": \"Medication details and dosage instructions...\",\n  \"patientId\": 1,\n  \"doctorId\": 1,\n  \"authorizedForPatient\": true\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/documents",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"documents"
+							]
+						},
+						"description": "Create a new document"
+					},
+					"response": []
+				},
+				{
+					"name": "Update Document",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"title\": \"Updated Medical Prescription\",\n  \"type\": \"PRESCRIPTION\",\n  \"content\": \"Updated medication details...\",\n  \"patientId\": 1,\n  \"doctorId\": 1,\n  \"authorizedForPatient\": true\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/documents/1",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"documents",
+								"1"
+							]
+						},
+						"description": "Update document information"
+					},
+					"response": []
+				},
+				{
+					"name": "Authorize Document For Patient",
+					"request": {
+						"method": "PATCH",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/documents/1/authorize?authorized=true",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"documents",
+								"1",
+								"authorize"
+							],
+							"query": [
+								{
+									"key": "authorized",
+									"value": "true"
+								}
+							]
+						},
+						"description": "Authorize or revoke patient access to document"
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Document",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/documents/1",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"documents",
+								"1"
+							]
+						},
+						"description": "Delete a document"
+					},
+					"response": []
+				}
+			],
+			"description": "Document management endpoints"
+		},
+		{
+			"name": "Medical Records",
+			"item": [
+				{
+					"name": "Get All Medical Records",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/medical-records",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"medical-records"
+							]
+						},
+						"description": "Retrieve all medical records"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Medical Record By ID",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/medical-records/1",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"medical-records",
+								"1"
+							]
+						},
+						"description": "Get medical record details by ID"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Medical Record By Patient",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/medical-records/patient/1",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"medical-records",
+								"patient",
+								"1"
+							]
+						},
+						"description": "Get medical record for a specific patient"
+					},
+					"response": []
+				},
+				{
+					"name": "Create Medical Record",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"patientId\": 1,\n  \"allergies\": \"Penicillin, Pollen\",\n  \"chronicDiseases\": \"Hypertension\",\n  \"medications\": \"Lisinopril 10mg daily\",\n  \"surgeries\": \"Appendectomy (2015)\",\n  \"familyHistory\": \"Diabetes (mother), Heart disease (father)\",\n  \"notes\": \"Patient requires regular blood pressure monitoring\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/medical-records",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"medical-records"
+							]
+						},
+						"description": "Create a new medical record"
+					},
+					"response": []
+				},
+				{
+					"name": "Update Medical Record",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"patientId\": 1,\n  \"allergies\": \"Penicillin, Pollen, Shellfish\",\n  \"chronicDiseases\": \"Hypertension, Type 2 Diabetes\",\n  \"medications\": \"Lisinopril 10mg daily, Metformin 500mg twice daily\",\n  \"surgeries\": \"Appendectomy (2015)\",\n  \"familyHistory\": \"Diabetes (mother), Heart disease (father)\",\n  \"notes\": \"Patient requires regular blood pressure and glucose monitoring\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/medical-records/1",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"medical-records",
+								"1"
+							]
+						},
+						"description": "Update medical record information"
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Medical Record",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/medical-records/1",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"medical-records",
+								"1"
+							]
+						},
+						"description": "Delete a medical record"
+					},
+					"response": []
+				}
+			],
+			"description": "Medical record management endpoints"
+		}
+	]
+}

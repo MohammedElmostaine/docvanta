@@ -11,7 +11,7 @@ import java.util.stream.Collectors;
 
 @Service
 @Transactional
-public class ClinicService {
+public class ClinicService implements org.example.docvanta_bcakend.service.interfaces.ClinicServiceInterface {
 
     private final ClinicRepository clinicRepository;
 
